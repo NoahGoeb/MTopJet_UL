@@ -11,6 +11,14 @@
 <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/sframe_all/MTopJet/presel">
 <!ENTITY DEBUG    "false">
 
+<!-- MC PuReweighting -->
+<!ENTITY DO_PU_REWEIGHTING          "true">     <!-- true, false -->
+<!ENTITY SYSTYPE_PU                 "central">  <!-- central, up, down -->
+<!ENTITY PILEUP_DIRECTORY           "&BASEdir;common/UHH2-data/UL18/MyMCPileupHistogram_UL18.root">
+<!ENTITY PILEUP_DIRECTORY_DATA      "&BASEdir;common/UHH2-data/UL18/MyDataPileupHistogram_UL18.root">
+<!ENTITY PILEUP_DIRECTORY_DATA_UP   "&BASEdir;common/UHH2-data/UL18/MyDataPileupHistogram_UL18_72383.root">
+<!ENTITY PILEUP_DIRECTORY_DATA_DOWN "&BASEdir;common/UHH2-data/UL18/MyDataPileupHistogram_UL18_66017.root">
+
 <!-- Lumi Values are not changed in outcomment Files!!!! -->
 
 <!-- ================================================================================================================================ -->
@@ -89,6 +97,14 @@
     <!--used only in UHH2/common/include/JetCorrections.cxx -->
     <Item Name="jecsmear_direction"             Value="&JECSMEAR_DIRECTION;"/>
     <Item Name="jersmear_direction"             Value="&JERSMEAR_DIRECTION;"/>
+
+    <!-- MC PuReweighting -->
+    <Item Name="DO_Pu_ReWeighting"              Value="&DO_PU_REWEIGHTING;"/>
+    <Item Name="SysType_PU"                     Value="&SYSTYPE_PU;"/>
+    <Item Name="pileup_directory"               Value="&PILEUP_DIRECTORY;"/>            <!--used only in UHH2/common/include/MCWeight.h -->
+    <Item Name="pileup_directory_data"          Value="&PILEUP_DIRECTORY_DATA;"/>       <!--used only in UHH2/common/include/MCWeight.h -->
+    <Item Name="pileup_directory_data_up"       Value="&PILEUP_DIRECTORY_DATA_UP;"/>    <!--used only in UHH2/common/include/MCWeight.h -->
+    <Item Name="pileup_directory_data_down"     Value="&PILEUP_DIRECTORY_DATA_DOWN;"/>  <!--used only in UHH2/common/include/MCWeight.h -->
 
     <!-- MC PuReweighting -->
     <Item Name="Debug" Value="&DEBUG;" />
