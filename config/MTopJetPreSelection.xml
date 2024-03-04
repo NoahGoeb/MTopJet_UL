@@ -115,7 +115,3 @@
 
   </Cycle>
 </JobConfiguration>
-    <!-- JERC -->
-    <!--used only in UHH2/common/include/JetCorrections.cxx -->
-    <Item Name="jecsmear_direction"             Value="&JECSMEAR_DIRECTION;"/>
-    <Item Name="jersmear_direction"             Value="&JERSMEAR_DIRECTION;"/>
