@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 <!ENTITY NEVT "100">
+<!-- JERC -->
+<!ENTITY JECSMEAR_DIRECTION         "nominal">  <!--nominal/down/up -->
+<!ENTITY JERSMEAR_DIRECTION         "nominal">  <!--nominal/down/up -->
 
 <!ENTITY OUTdir  "/nfs/dust/cms/user/paaschal/sframe_all/MTopJet/presel">
 
@@ -84,3 +87,7 @@
 
   </Cycle>
 </JobConfiguration>
+    <!-- JERC -->
+    <!--used only in UHH2/common/include/JetCorrections.cxx -->
+    <Item Name="jecsmear_direction"             Value="&JECSMEAR_DIRECTION;"/>
+    <Item Name="jersmear_direction"             Value="&JERSMEAR_DIRECTION;"/>
