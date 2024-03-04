@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 <!ENTITY NEVT "100">
+
 <!-- JERC -->
 <!ENTITY JECSMEAR_DIRECTION         "nominal">  <!--nominal/down/up -->
 <!ENTITY JERSMEAR_DIRECTION         "nominal">  <!--nominal/down/up -->
 
-<!ENTITY OUTdir  "/nfs/dust/cms/user/paaschal/sframe_all/MTopJet/presel">
+<!-- USER based variables -->
+<!ENTITY BASEdir  "/nfs/dust/cms/user/paaschal/WorkingArea/Analysis/MTopJet/UHH2_MTopJet_UL/CMSSW_10_6_28/src/UHH2/">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/sframe_all/MTopJet/presel">
+<!ENTITY DEBUG    "false">
 
 <!-- Lumi Values are not changed in outcomment Files!!!! -->
 
@@ -80,6 +84,14 @@
 
     <!-- if use_sframe_weight is set to 'false' the weight is changed according to the lumi -->
     <Item Name="use_sframe_weight" Value="false"/> <!-- this does nothing becaus common modules is not called in the AnalysisModule -->
+
+    <!-- JERC -->
+    <!--used only in UHH2/common/include/JetCorrections.cxx -->
+    <Item Name="jecsmear_direction"             Value="&JECSMEAR_DIRECTION;"/>
+    <Item Name="jersmear_direction"             Value="&JERSMEAR_DIRECTION;"/>
+
+    <!-- MC PuReweighting -->
+    <Item Name="Debug" Value="&DEBUG;" />
 
     <Item Name="AnalysisModule" Value="MTopJetModule"/>
 
