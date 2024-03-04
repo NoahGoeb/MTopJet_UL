@@ -39,6 +39,10 @@ private:
     
     // store the Hists collection as member variables. Again, use unique_ptr to avoid memory leaks.
     std::unique_ptr<Hists> h_nocuts, h_njet, h_dijet, h_ele;
+
+
+    // bools
+    bool isMC;
 };
 
 
@@ -53,6 +57,8 @@ MTopJetModule::MTopJetModule(Context & ctx){
     // If needed, access the configuration of the module here, e.g.:
     string testvalue = ctx.get("TestKey", "<not set>");
     cout << "TestKey in the configuration was: " << testvalue << endl;
+
+    isMC = (ctx.get("dataset_type") == "MC");
 
     //HIST-classes
     h_ttbar.reset(new TTbarGenHists(ctx, "TTbar"));
