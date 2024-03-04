@@ -40,9 +40,11 @@ private:
     // store the Hists collection as member variables. Again, use unique_ptr to avoid memory leaks.
     std::unique_ptr<Hists> h_nocuts, h_njet, h_dijet, h_ele;
 
-
     // bools
     bool isMC;
+
+    // store Hist collection as member variables
+    std::unique_ptr<Hists> h_ttbar;
 };
 
 
