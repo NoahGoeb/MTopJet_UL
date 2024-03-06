@@ -43,6 +43,8 @@ protected:
 
   std::unique_ptr<uhh2::Selection> genmttbar_sel;
   std::unique_ptr<uhh2::Selection> met_sel;
+  std::unique_ptr<uhh2::Selection> muon_sel;
+  std::unique_ptr<uhh2::Selection> elec_sel;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -108,6 +110,8 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 
   //// EVENT SELECTION REC
   met_sel.reset(new METCut(40, uhh2::infinity));
+  muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
+  elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
 
 }
 
@@ -137,9 +141,11 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
     if(!genmttbar_sel->passes(event)) return false;
   }
 
+  const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
   const bool pass_met = met_sel->passes(event);
+  const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
 
-  if(pass_met) passed_recsel = true;
+  if(pass_lep1 && pass_met && pass_lepsel) passed_recsel = true;
   else passed_recsel = false;
 
   if(true) passed_gensel = true;
