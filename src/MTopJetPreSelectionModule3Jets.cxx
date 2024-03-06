@@ -40,6 +40,10 @@ protected:
   // selections
   std::unique_ptr<uhh2::Selection> lumi_sel;
 
+  std::unique_ptr<uhh2::Selection> genmttbar_sel;
+
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
+
   // handles for output
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
@@ -85,6 +89,21 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 
   if(debug) cout << "LumiSelection End" << endl;
 
+  /* GEN M-ttbar selection [TTbar MC "0.<M^{gen}_{ttbar}(GeV)<700.] */
+  const std::string ttbar_gen_label("ttbargen");
+
+  ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
+
+  if(debug) cout << "TTbarGenProducer" << endl;
+
+  TString samplename = ctx.get("dataset_version");
+  if( samplename.Contains("Mtt0000to0700") ){
+    genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
+  }
+  else{
+    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+  }
+
 }
 
 /*
@@ -105,6 +124,12 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
   /* CMS-certified luminosity sections */
   if(event.isRealData){
     if(!lumi_sel->passes(event)) return false;
+  }
+
+  if(!event.isRealData){
+    /* GEN M-ttbar selection */
+    ttgenprod->process(event);
+    if(!genmttbar_sel->passes(event)) return false;
   }
 
 
