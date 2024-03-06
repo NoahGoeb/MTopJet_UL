@@ -36,6 +36,10 @@ public:
   virtual bool process(uhh2::Event&) override;
 
 protected:
+
+
+  // bools
+  bool debug;
   
 };
 
@@ -48,6 +52,8 @@ protected:
 */
 
 MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ctx){
+
+  debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
 
 }
 
