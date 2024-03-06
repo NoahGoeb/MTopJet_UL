@@ -37,6 +37,9 @@ public:
 
 protected:
 
+  // selections
+  std::unique_ptr<uhh2::Selection> lumi_sel;
+
   // handles for output
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
@@ -74,6 +77,14 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 
   h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
 
+  if(debug) cout << "Output and Handles End" << endl;
+
+  //// COMMON MODULES
+
+  if(!isMC) lumi_sel.reset(new LumiSelection(ctx));
+
+  if(debug) cout << "LumiSelection End" << endl;
+
 }
 
 /*
@@ -90,6 +101,11 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
 
   bool passed_recsel;
   bool passed_gensel;
+
+  /* CMS-certified luminosity sections */
+  if(event.isRealData){
+    if(!lumi_sel->passes(event)) return false;
+  }
 
 
   if(true) passed_recsel = true;
