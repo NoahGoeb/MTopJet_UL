@@ -39,6 +39,7 @@ protected:
 
 
   // bools
+  bool isMC;
   bool debug;
   
 };
@@ -59,6 +60,10 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
   bool isherwig;
   if(ctx.get("dataset_version") == "TTbar_powheg-herwig") isherwig = true;
   else isherwig = false;
+
+  isMC = (ctx.get("dataset_type") == "MC"); 
+
+  if(debug) cout << "CONFIGURATION END" << endl;
 
 }
 
