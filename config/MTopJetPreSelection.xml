@@ -7,8 +7,8 @@
 <!ENTITY JERSMEAR_DIRECTION         "nominal">  <!--nominal/down/up -->
 
 <!-- USER based variables -->
-<!ENTITY BASEdir  "/nfs/dust/cms/user/paaschal/WorkingArea/Analysis/MTopJet/UHH2_MTopJet_UL/CMSSW_10_6_28/src/UHH2/">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/sframe_all/MTopJet/presel">
+<!ENTITY BASEdir  "/nfs/dust/cms/user/goebnoah/UHH2_UL_MTop/CMSSW_10_6_28/src/UHH2/">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PreSelection/UL/">
 <!ENTITY DEBUG    "false">
 
 <!-- MC PuReweighting -->
@@ -39,7 +39,7 @@
 
 <!--
    <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="100" />
-   <ConfigSGE RAM ="4" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="Workdir_PreSel_2018"/>
+   <ConfigSGE RAM ="4" DISK ="2" Mail="noah.goeb@desy.de" Notification="as" Workdir="Workdir_PreSel_2018"/>
 -->
 
 <JobConfiguration JobName="MTopJetPreSelectionJob" OutputLevel="INFO">
