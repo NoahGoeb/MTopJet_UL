@@ -86,6 +86,23 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 
 bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
 
+  if(debug) cout << "Start Module - Process" << endl;
+
+  bool passed_recsel;
+  bool passed_gensel;
+
+
+  if(true) passed_recsel = true;
+  else passed_recsel = false;
+
+  if(true) passed_gensel = true;
+  else passed_gensel = false;
+
+  if(!passed_recsel && !passed_gensel) return false;
+
+  event.set(h_recsel, passed_recsel);
+  event.set(h_gensel, passed_gensel);
+
 }
 
 UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPreSelectionModule3Jets)
