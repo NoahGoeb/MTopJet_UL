@@ -7,8 +7,8 @@
 #include "UHH2/common/include/CleaningModules.h"
 #include "UHH2/common/include/ElectronHists.h"
 #include "UHH2/common/include/NSelections.h"
-#include "UHH2/MTopJet/include/MTopJetSelections.h"
-#include "UHH2/MTopJet/include/MTopJetHists.h"
+#include "UHH2/MTopJet_UL/include/MTopJetSelections.h"
+#include "UHH2/MTopJet_UL/include/MTopJetHists.h"
 #include "UHH2/common/include/TTbarGenHists.h"
 
 using namespace std;
