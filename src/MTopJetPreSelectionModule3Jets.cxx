@@ -55,6 +55,11 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 
   debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
 
+  //// CONFIGURATION
+  bool isherwig;
+  if(ctx.get("dataset_version") == "TTbar_powheg-herwig") isherwig = true;
+  else isherwig = false;
+
 }
 
 /*
