@@ -145,7 +145,15 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
   const bool pass_met = met_sel->passes(event);
   const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
 
-  if(pass_lep1 && pass_met && pass_lepsel) passed_recsel = true;
+  // cut on fatjet pt
+  bool passed_fatpt=false;
+  std::vector<TopJet> jets = event.get(h_fatjets);
+  double ptcut = 200;
+  for(auto jet: jets){
+    if(jet.pt() > ptcut) passed_fatpt = true;
+  }
+
+  if(pass_lep1 && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
   else passed_recsel = false;
 
   if(true) passed_gensel = true;
