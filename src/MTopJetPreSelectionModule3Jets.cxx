@@ -40,6 +40,7 @@ protected:
   // handles for output
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
+  Event::Handle<std::vector<TopJet>>h_fatjets;
 
   // bools
   bool isMC;
@@ -70,6 +71,8 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
+
+  h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
 
 }
 
