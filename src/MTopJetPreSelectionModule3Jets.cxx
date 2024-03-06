@@ -27,6 +27,7 @@
 //
 #include <UHH2/MTopJet_UL/include/ModuleBASE.h>
 #include <UHH2/MTopJet_UL/include/RecoSelections.h>
+#include <UHH2/MTopJet_UL/include/GenSelections.h>
 
 using namespace std;
 
@@ -45,6 +46,7 @@ protected:
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
+  std::unique_ptr<uhh2::Selection> SemiLepDecay;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -113,6 +115,10 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
   muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
   elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
 
+  //// EVENTS SELECTION GEN
+  if(isMC && !isherwig) SemiLepDecay.reset(new TTbarSemilep(ctx));
+  else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
+
 }
 
 /*
@@ -153,10 +159,14 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
     if(jet.pt() > ptcut) passed_fatpt = true;
   }
 
+  bool pass_semilep;
+  if(isMC) pass_semilep = SemiLepDecay->passes(event);
+  else pass_semilep=false;
+
   if(pass_lep1 && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
   else passed_recsel = false;
 
-  if(true) passed_gensel = true;
+  if(pass_semilep) passed_gensel = true;
   else passed_gensel = false;
 
   if(!passed_recsel && !passed_gensel) return false;
