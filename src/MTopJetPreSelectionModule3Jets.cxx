@@ -26,6 +26,7 @@
 #include <UHH2/MTopJet_UL/include/MTopJetHists.h>
 //
 #include <UHH2/MTopJet_UL/include/ModuleBASE.h>
+#include <UHH2/MTopJet_UL/include/RecoSelections.h>
 
 using namespace std;
 
@@ -41,6 +42,7 @@ protected:
   std::unique_ptr<uhh2::Selection> lumi_sel;
 
   std::unique_ptr<uhh2::Selection> genmttbar_sel;
+  std::unique_ptr<uhh2::Selection> met_sel;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -104,6 +106,9 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
     genmttbar_sel.reset(new uhh2::AndSelection(ctx));
   }
 
+  //// EVENT SELECTION REC
+  met_sel.reset(new METCut(40, uhh2::infinity));
+
 }
 
 /*
@@ -132,8 +137,9 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
     if(!genmttbar_sel->passes(event)) return false;
   }
 
+  const bool pass_met = met_sel->passes(event);
 
-  if(true) passed_recsel = true;
+  if(pass_met) passed_recsel = true;
   else passed_recsel = false;
 
   if(true) passed_gensel = true;
