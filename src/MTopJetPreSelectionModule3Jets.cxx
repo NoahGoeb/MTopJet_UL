@@ -29,10 +29,10 @@
 
 using namespace std;
 
-class MTopJet3GenPreSelectionModule : public ModuleBASE {
+class MTopJetPreSelectionModule3Jets : public ModuleBASE {
 
 public:
-  explicit MTopJet3GenPreSelectionModule(uhh2::Context&);
+  explicit MTopJetPreSelectionModule3Jets(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
 
 protected:
@@ -47,7 +47,7 @@ protected:
 ██      ██  ██████  ██████   ██████  ███████ ███████
 */
 
-MTopJet3GenPreSelectionModule::MTopJet3GenPreSelectionModule(uhh2::Context& ctx){
+MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ctx){
 
 }
 
@@ -59,8 +59,8 @@ MTopJet3GenPreSelectionModule::MTopJet3GenPreSelectionModule(uhh2::Context& ctx)
 ██      ██   ██  ██████   ██████ ███████ ███████ ███████
 */
 
-bool MTopJet3GenPreSelectionModule::process(uhh2::Event& event){
+bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
 
 }
 
-UHH2_REGISTER_ANALYSIS_MODULE(MTopJet3GenPreSelectionModule)
+UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPreSelectionModule3Jets)
