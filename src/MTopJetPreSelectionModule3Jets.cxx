@@ -84,6 +84,7 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 
   if(debug) cout << "CONFIGURATION END" << endl;
 
+  //// HANDLES
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
 
@@ -139,9 +140,6 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
 
   if(debug) cout << "Start Module - Process" << endl;
 
-  bool passed_recsel;
-  bool passed_gensel;
-
   /* CMS-certified luminosity sections */
   if(event.isRealData){
     if(!lumi_sel->passes(event)) return false;
@@ -153,9 +151,12 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
     if(!genmttbar_sel->passes(event)) return false;
   }
 
-  const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
-  const bool pass_met = met_sel->passes(event);
-  const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
+  //// EVENT SELECTION REC
+  bool passed_recsel;
+
+  bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
+  bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
+  bool pass_met = met_sel->passes(event);
 
   // cut on fatjet pt
   bool passed_fatpt=false;
@@ -164,6 +165,14 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
   for(auto jet: jets){
     if(jet.pt() > ptcut) passed_fatpt = true;
   }
+  
+  if(debug) cout << "lepton pt" << endl;
+
+  if(pass_lep1 && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
+  else passed_recsel = false;
+
+  //// EVNET SELECTION GEN
+  bool passed_gensel;
 
   bool pass_semilep;
   if(isMC) pass_semilep = SemiLepDecay->passes(event);
@@ -172,16 +181,13 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
   bool pass_genlepton = false;
   bool pass_genmuon = false;
   bool pass_genelec = false;
+
   if(isMC){
     pass_genmuon = GenMuonPT->passes(event);
     pass_genelec = GenElecPT->passes(event);
   }
+
   if(pass_genmuon || pass_genelec) pass_genlepton = true;
-
-  if(debug) cout << "lepton pt" << endl;
-
-  if(pass_lep1 && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
-  else passed_recsel = false;
 
   if(pass_semilep && pass_genlepton) passed_gensel = true;
   else passed_gensel = false;
@@ -190,6 +196,8 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
 
   event.set(h_recsel, passed_recsel);
   event.set(h_gensel, passed_gensel);
+
+  return true;
 
 }
 
