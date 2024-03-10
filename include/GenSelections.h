@@ -39,5 +39,27 @@ namespace uhh2 {
     explicit TTbarSemilep_herwig(Context&);
     virtual bool passes(const Event&) override;
   };
+
+  class GenMuonSel : public Selection {
+
+  public:
+    explicit GenMuonSel(Context&, double);
+    virtual bool passes(const Event&) override;
+
+  protected:
+    double ptmin;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
+
+  class GenElecSel : public Selection {
+
+  public:
+    explicit GenElecSel(Context&, double);
+    virtual bool passes(const Event&) override;
+
+  protected:
+    double ptmin;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
   
 }

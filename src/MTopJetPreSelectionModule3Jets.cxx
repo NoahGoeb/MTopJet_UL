@@ -47,6 +47,8 @@ protected:
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
+  std::unique_ptr<uhh2::Selection> GenMuonPT;
+  std::unique_ptr<uhh2::Selection> GenElecPT;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -118,6 +120,10 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
   //// EVENTS SELECTION GEN
   if(isMC && !isherwig) SemiLepDecay.reset(new TTbarSemilep(ctx));
   else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
+  if(isMC){
+    GenMuonPT.reset(new GenMuonSel(ctx, 55.));
+    GenElecPT.reset(new GenElecSel(ctx, 55.));
+  }
 
 }
 
@@ -163,10 +169,21 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
   if(isMC) pass_semilep = SemiLepDecay->passes(event);
   else pass_semilep=false;
 
+  bool pass_genlepton = false;
+  bool pass_genmuon = false;
+  bool pass_genelec = false;
+  if(isMC){
+    pass_genmuon = GenMuonPT->passes(event);
+    pass_genelec = GenElecPT->passes(event);
+  }
+  if(pass_genmuon || pass_genelec) pass_genlepton = true;
+
+  if(debug) cout << "lepton pt" << endl;
+
   if(pass_lep1 && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
   else passed_recsel = false;
 
-  if(pass_semilep) passed_gensel = true;
+  if(pass_semilep && pass_genlepton) passed_gensel = true;
   else passed_gensel = false;
 
   if(!passed_recsel && !passed_gensel) return false;
