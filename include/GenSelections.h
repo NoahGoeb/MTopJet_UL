@@ -33,13 +33,6 @@ namespace uhh2 {
 
   };
 
-  class TTbarSemilep_herwig : public Selection {
-
-  public:
-    explicit TTbarSemilep_herwig(Context&);
-    virtual bool passes(const Event&) override;
-  };
-
   class GenMuonSel : public Selection {
 
   public:

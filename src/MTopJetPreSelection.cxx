@@ -31,10 +31,10 @@
 
 using namespace std;
 
-class MTopJetPreSelectionModule3Jets : public ModuleBASE {
+class MTopJetPreSelection : public ModuleBASE {
 
 public:
-  explicit MTopJetPreSelectionModule3Jets(uhh2::Context&);
+  explicit MTopJetPreSelection(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
 
 protected:
@@ -71,39 +71,35 @@ protected:
 ██      ██  ██████  ██████   ██████  ███████ ███████
 */
 
-MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ctx){
+MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
 
   debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
 
   //// CONFIGURATION
-  bool isherwig;
-  if(ctx.get("dataset_version") == "TTbar_powheg-herwig") isherwig = true;
-  else isherwig = false;
+  if(debug) cout << "Configuration" << endl;
 
   isMC = (ctx.get("dataset_type") == "MC"); 
 
-  if(debug) cout << "CONFIGURATION END" << endl;
-
   //// HANDLES
+  if(debug) cout << "Output and Handles" << endl;
+
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
 
   h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
 
-  if(debug) cout << "Output and Handles End" << endl;
-
   //// COMMON MODULES
+  
+  if(debug) cout << "Common Modules" << endl;
 
   if(!isMC) lumi_sel.reset(new LumiSelection(ctx));
 
-  if(debug) cout << "LumiSelection End" << endl;
-
   /* GEN M-ttbar selection [TTbar MC "0.<M^{gen}_{ttbar}(GeV)<700.] */
+  if(debug) cout << "TTbarGenProducer" << endl;
+
   const std::string ttbar_gen_label("ttbargen");
 
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
-
-  if(debug) cout << "TTbarGenProducer" << endl;
 
   TString samplename = ctx.get("dataset_version");
   if( samplename.Contains("Mtt0000to0700") ){
@@ -119,8 +115,7 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
   elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
 
   //// EVENTS SELECTION GEN
-  if(isMC && !isherwig) SemiLepDecay.reset(new TTbarSemilep(ctx));
-  else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
+  SemiLepDecay.reset(new TTbarSemilep(ctx));
   if(isMC){
     GenMuonPT.reset(new GenMuonSel(ctx, 55.));
     GenElecPT.reset(new GenElecSel(ctx, 55.));
@@ -136,7 +131,7 @@ MTopJetPreSelectionModule3Jets::MTopJetPreSelectionModule3Jets(uhh2::Context& ct
 ██      ██   ██  ██████   ██████ ███████ ███████ ███████
 */
 
-bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
+bool MTopJetPreSelection::process(uhh2::Event& event){
 
   if(debug) cout << "Start Module - Process" << endl;
 
@@ -154,7 +149,7 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
   //// EVENT SELECTION REC
   bool passed_recsel;
 
-  bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
+  bool pass_lep_number = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
   bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
   bool pass_met = met_sel->passes(event);
 
@@ -165,10 +160,8 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
   for(auto jet: jets){
     if(jet.pt() > ptcut) passed_fatpt = true;
   }
-  
-  if(debug) cout << "lepton pt" << endl;
 
-  if(pass_lep1 && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
+  if(pass_lep_number && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
   else passed_recsel = false;
 
   //// EVNET SELECTION GEN
@@ -201,4 +194,4 @@ bool MTopJetPreSelectionModule3Jets::process(uhh2::Event& event){
 
 }
 
-UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPreSelectionModule3Jets)
+UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPreSelection)
