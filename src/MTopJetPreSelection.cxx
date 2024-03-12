@@ -46,6 +46,8 @@ protected:
   // cleaners & Correctors
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
+  std::unique_ptr<CommonModules>   common;
+  std::unique_ptr<JetCleaner> jet_cleaner1;
 
   // selections
   std::unique_ptr<uhh2::Selection> lumi_sel;
@@ -125,10 +127,20 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   // ids
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
   ElectronId eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Fall17_tight_noIso);
+  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
 
   // CLEANER
   muoSR_cleaner.reset(new     MuonCleaner(muid));
   eleSR_cleaner.reset(new ElectronCleaner(eleid_noiso55));
+
+  common.reset(new CommonModules());
+  common->set_HTjetid(jetid_cleaner);
+  common->switch_jetlepcleaner(true);
+  common->switch_metcorrection();
+  common->disable_mcpileupreweight();
+  common->init(ctx);
+  
+  jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
 
   //// EVENT SELECTION REC
   met_sel.reset(new METCut(40, uhh2::infinity));
@@ -173,6 +185,11 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   eleSR_cleaner->process(event);
   if(event.electrons->size() > 0) sort_by_pt<Electron>(*event.electrons);
+
+  if(!common->process(event)) return false;
+
+  jet_cleaner1->process(event);
+  sort_by_pt<Jet>(*event.jets);
 
   //// EVENT SELECTION REC
   bool passed_recsel;
