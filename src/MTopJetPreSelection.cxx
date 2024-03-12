@@ -42,6 +42,8 @@ public:
   virtual bool process(uhh2::Event&) override;
 
 protected:
+  enum lepton { muon, elec };
+  lepton channel_;
 
   // cleaners & Correctors
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
@@ -96,6 +98,17 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   if(dataset_version.Contains("TTbar") || dataset_version.Contains("TTTo")) isTTbar = true;
   else  isTTbar = false;
 
+  const std::string& channel = ctx.get("channel", "");
+  if     (channel == "muon") channel_ = muon;
+  else if(channel == "elec") channel_ = elec;
+  else {
+
+    std::string log("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- ");
+    log += "invalid argument for 'channel' key in xml file (must be 'muon' or 'elec'): \""+channel+"\"";
+
+    throw std::runtime_error(log);
+  }
+
   //// HANDLES
   if(debug) cout << "Output and Handles" << endl;
 
@@ -144,9 +157,15 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
 
   //// EVENT SELECTION REC
-  met_sel.reset(new METCut(40, uhh2::infinity));
-  muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
-  elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
+  met_sel.reset(new METCut(50 , uhh2::infinity));
+  if(channel_ == elec){
+    muon_sel.reset(new NMuonSelection(0, 0, muid));
+    elec_sel.reset(new NElectronSelection(1, 1, eleid_noiso55));
+  }
+  else if (channel_ == muon){
+    muon_sel.reset(new NMuonSelection(1, 1, muid));
+    elec_sel.reset(new NElectronSelection(0, 0, eleid_noiso55));
+  }
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
 
   //// EVENTS SELECTION GEN
@@ -197,7 +216,7 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   bool passed_recsel;
 
   bool pass_lep_number = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
-  bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
+  bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
   bool pass_met = met_sel->passes(event);
   bool pass_prim_vert = pv_sel->passes(event);
 
