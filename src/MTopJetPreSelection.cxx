@@ -15,7 +15,11 @@
 #include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
-#include "UHH2/common/include/YearRunSwitchers.h"
+#include <UHH2/common/include/YearRunSwitchers.h>
+#include <UHH2/common/include/CleaningModules.h>
+#include <UHH2/common/include/CommonModules.h>
+#include <UHH2/common/include/MuonIds.h>
+#include <UHH2/common/include/ElectronIds.h>
 
 // Hists
 #include <UHH2/common/include/ElectronHists.h>
@@ -38,6 +42,10 @@ public:
   virtual bool process(uhh2::Event&) override;
 
 protected:
+
+  // cleaners & Correctors
+  std::unique_ptr<MuonCleaner>     muoSR_cleaner;
+  std::unique_ptr<ElectronCleaner> eleSR_cleaner;
 
   // selections
   std::unique_ptr<uhh2::Selection> lumi_sel;
@@ -114,6 +122,14 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
     genmttbar_sel.reset(new uhh2::AndSelection(ctx));
   }
 
+  // ids
+  MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
+  ElectronId eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Fall17_tight_noIso);
+
+  // CLEANER
+  muoSR_cleaner.reset(new     MuonCleaner(muid));
+  eleSR_cleaner.reset(new ElectronCleaner(eleid_noiso55));
+
   //// EVENT SELECTION REC
   met_sel.reset(new METCut(40, uhh2::infinity));
   muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
@@ -150,6 +166,13 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
     ttgenprod->process(event);
     if(!genmttbar_sel->passes(event)) return false;
   }
+
+  //// CLEANER
+  muoSR_cleaner->process(event);
+  if(event.muons->size() > 0) sort_by_pt<Muon>(*event.muons);
+
+  eleSR_cleaner->process(event);
+  if(event.electrons->size() > 0) sort_by_pt<Electron>(*event.electrons);
 
   //// EVENT SELECTION REC
   bool passed_recsel;
