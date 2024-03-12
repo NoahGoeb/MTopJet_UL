@@ -59,6 +59,7 @@ protected:
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
   std::unique_ptr<uhh2::Selection> GenMuonPT;
   std::unique_ptr<uhh2::Selection> GenElecPT;
+  std::unique_ptr<uhh2::Selection> pv_sel;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -146,6 +147,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   met_sel.reset(new METCut(40, uhh2::infinity));
   muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
   elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
+  pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
 
   //// EVENTS SELECTION GEN
   SemiLepDecay.reset(new TTbarSemilep(ctx));
@@ -197,6 +199,7 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   bool pass_lep_number = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
   bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
   bool pass_met = met_sel->passes(event);
+  bool pass_prim_vert = pv_sel->passes(event);
 
   // cut on fatjet pt
   bool passed_fatpt=false;
@@ -206,7 +209,7 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
     if(jet.pt() > ptcut) passed_fatpt = true;
   }
 
-  if(pass_lep_number && pass_met && pass_lepsel && passed_fatpt) passed_recsel = true;
+  if(pass_lep_number && pass_met && pass_lepsel && passed_fatpt && pass_prim_vert) passed_recsel = true;
   else passed_recsel = false;
 
   //// EVNET SELECTION GEN
