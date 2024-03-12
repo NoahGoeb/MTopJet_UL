@@ -59,6 +59,7 @@ protected:
 
   // bools
   bool isMC;
+  bool isTTbar;
   bool debug;
   
 };
@@ -79,6 +80,10 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   if(debug) cout << "Configuration" << endl;
 
   isMC = (ctx.get("dataset_type") == "MC"); 
+
+  TString dataset_version = (TString) ctx.get("dataset_version");
+  if(dataset_version.Contains("TTbar") || dataset_version.Contains("TTTo")) isTTbar = true;
+  else  isTTbar = false;
 
   //// HANDLES
   if(debug) cout << "Output and Handles" << endl;
