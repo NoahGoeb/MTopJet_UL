@@ -4,6 +4,7 @@
 #include <UHH2/core/include/AnalysisModule.h>
 #include <UHH2/core/include/Event.h>
 #include <UHH2/core/include/Selection.h>
+#include <UHH2/core/include/Electron.h>
 
 #include <UHH2/common/include/NSelections.h>
 #include <UHH2/common/include/LumiSelection.h>
@@ -141,7 +142,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
 
   // ids
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
-  ElectronId eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Fall17_tight_noIso);
+  ElectronId eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronTagID(Electron::cutBasedElectronID_Fall17_94X_V2_tight));
   JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
 
   // CLEANER
