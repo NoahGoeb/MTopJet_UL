@@ -69,6 +69,7 @@ protected:
   std::unique_ptr<uhh2::Selection> GenElecPT;
   std::unique_ptr<uhh2::Selection> pv_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
+  std::unique_ptr<uhh2::Selection> badhcal_sel;
   std::unique_ptr<uhh2::Selection> trigger_mu_A;
   std::unique_ptr<uhh2::Selection> trigger_mu_B;
   std::unique_ptr<uhh2::Selection> trigger_el_A;
@@ -220,6 +221,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   elec_sel_triggerA.reset(new NElectronSelection(1, 1, eleid_iso55));
   elec_sel_120.reset(new NElectronSelection(1, 1, eleid_noiso120));
   twodcut_sel.reset(new TwoDCut1(0.4, 40));
+  badhcal_sel.reset(new BadHCALSelection(ctx));
 
   //// TRIGGER
   trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
@@ -292,7 +294,7 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
     if(jet.pt() > ptcut) pass_fatpt = true;
   }
 
-  //// TRIGGER
+  // trigger
   bool pass_lep_trigger = false;
   bool pass_mu_trigger = false;
   bool pass_elec_trigger = true;
@@ -377,7 +379,7 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   pass_lep_trigger = pass_mu_trigger && pass_elec_trigger;
 
-  //// lepton-2Dcut variables
+  // lepton-2Dcut variables
   bool pass_twodcut  = twodcut_sel->passes(event);
 
   for(auto& muo : *event.muons){
@@ -398,11 +400,14 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   }
   if(elec_is_isolated) pass_twodcut = true; // do not do 2D cut for isolated electrons
 
-  //// SECOND CLEANER
+  // second cleaner
   jet_cleaner2->process(event);
   sort_by_pt<Jet>(*event.jets);
 
-  if(pass_lep_number && pass_met && pass_lepsel && pass_fatpt && pass_prim_vert && pass_lep_trigger && pass_twodcut) passed_recsel = true;
+  // bad HCAL
+  bool pass_badhcal = badhcal_sel->passes(event);
+
+  if(pass_lep_number && pass_met && pass_lepsel && pass_fatpt && pass_prim_vert && pass_lep_trigger && pass_twodcut && pass_badhcal) passed_recsel = true;
   else passed_recsel = false;
 
   //// EVNET SELECTION GEN
