@@ -35,4 +35,17 @@ namespace uhh2 {
   private:
     float min_met_, max_met_;
   };
+
+  ////////////////////////////////////////////////////////////////
+  
+  class ElectronEtaVeto : public Selection {
+
+  public:
+    explicit ElectronEtaVeto(double, double);
+    virtual bool passes(const Event&) override;
+
+  private:
+    double lower, upper;
+  };
+
 }

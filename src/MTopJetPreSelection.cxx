@@ -58,6 +58,7 @@ protected:
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
+  std::unique_ptr<uhh2::Selection> elec_etaveto;
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
   std::unique_ptr<uhh2::Selection> GenMuonPT;
   std::unique_ptr<uhh2::Selection> GenElecPT;
@@ -166,6 +167,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
     muon_sel.reset(new NMuonSelection(1, 1, muid));
     elec_sel.reset(new NElectronSelection(0, 0, eleid_noiso55));
   }
+  elec_etaveto.reset(new ElectronEtaVeto(1.44, 1.57));
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
 
   //// EVENTS SELECTION GEN
@@ -217,6 +219,7 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   bool pass_lep_number = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
   bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
+  if(channel_ == elec) pass_lepsel = elec_etaveto->passes(event);
   bool pass_met = met_sel->passes(event);
   bool pass_prim_vert = pv_sel->passes(event);
 
