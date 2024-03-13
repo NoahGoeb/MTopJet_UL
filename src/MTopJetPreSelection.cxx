@@ -21,6 +21,7 @@
 #include <UHH2/common/include/CommonModules.h>
 #include <UHH2/common/include/MuonIds.h>
 #include <UHH2/common/include/ElectronIds.h>
+#include <UHH2/common/include/YearRunSwitchers.h>
 
 // Hists
 #include <UHH2/common/include/ElectronHists.h>
@@ -64,6 +65,8 @@ protected:
   std::unique_ptr<uhh2::Selection> GenMuonPT;
   std::unique_ptr<uhh2::Selection> GenElecPT;
   std::unique_ptr<uhh2::Selection> pv_sel;
+  std::unique_ptr<uhh2::Selection> trigger_mu_A;
+  std::unique_ptr<uhh2::Selection> trigger_mu_B;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -72,10 +75,16 @@ protected:
   Event::Handle<bool>h_gensel;
   Event::Handle<std::vector<TopJet>>h_fatjets;
 
+  Year year;
+
   // bools
   bool isMC;
   bool isTTbar;
   bool debug;
+
+  bool year_16 = false;
+  bool year_17 = false;
+  bool year_18 = true;
   
 };
 
@@ -90,6 +99,14 @@ protected:
 MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
 
   debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
+
+  //// YEARSWITCHER
+  year = extract_year(ctx); // Ask for the year of Event
+
+  if(year == Year::is2016v3) year_16 = true;
+  else if(year == Year::isUL17) year_17 = true;
+  else if(year == Year::isUL18) year_18 = true;
+  else throw runtime_error("In MTopJetPreSelection: This Event is not from 2016v3, 2017v2 or 2018!");
 
   //// CONFIGURATION
   if(debug) cout << "Configuration" << endl;
@@ -140,12 +157,16 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
     genmttbar_sel.reset(new uhh2::AndSelection(ctx));
   }
 
-  // ids
+  //// IDs
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
   ElectronId eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronTagID(Electron::cutBasedElectronID_Fall17_94X_V2_tight));
   JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
 
-  // CLEANER
+  //// TRIGGER
+  trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
+  trigger_mu_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
+
+  //// CLEANER
   muoSR_cleaner.reset(new     MuonCleaner(muid));
   eleSR_cleaner.reset(new ElectronCleaner(eleid_noiso55));
 
@@ -224,15 +245,34 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   bool pass_met = met_sel->passes(event);
   bool pass_prim_vert = pv_sel->passes(event);
 
+  //// TRIGGER
+  bool pass_lep_trigger = false;
+  bool pass_mu_trigger = false;
+  if(channel_ == muon){
+    if(year_16){
+      if(!isMC && event.run < 274954){
+        pass_mu_trigger = trigger_mu_A->passes(event);
+      }
+      else{
+        pass_mu_trigger = (trigger_mu_A->passes(event) || trigger_mu_B->passes(event));
+      }
+    }
+    if(year_17 || year_18){
+      pass_mu_trigger = trigger_mu_A->passes(event);
+    }
+  }
+
+  pass_lep_trigger = pass_mu_trigger;
+
   // cut on fatjet pt
-  bool passed_fatpt=false;
+  bool pass_fatpt=false;
   std::vector<TopJet> jets = event.get(h_fatjets);
   double ptcut = 200;
   for(auto jet: jets){
-    if(jet.pt() > ptcut) passed_fatpt = true;
+    if(jet.pt() > ptcut) pass_fatpt = true;
   }
 
-  if(pass_lep_number && pass_met && pass_lepsel && passed_fatpt && pass_prim_vert) passed_recsel = true;
+  if(pass_lep_number && pass_met && pass_lepsel && pass_fatpt && pass_prim_vert && pass_lep_trigger) passed_recsel = true;
   else passed_recsel = false;
 
   //// EVNET SELECTION GEN
