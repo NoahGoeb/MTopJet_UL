@@ -12,6 +12,9 @@
 #include <UHH2/common/include/ObjectIdUtils.h>
 #include <UHH2/common/include/TopJetIds.h>
 #include <UHH2/common/include/TTbarGen.h>
+#include <UHH2/common/include/Utils.h>
+
+#include <UHH2/MTopJet_UL/include/MTopJetUtils.h>
 
 #include <iostream>
 #include <fstream>
@@ -47,5 +50,19 @@ namespace uhh2 {
   private:
     double lower, upper;
   };
+
+  ////////////////////////////////////////////////////////////////
+
+  class TwoDCut1 : public Selection {
+
+  public:
+    explicit TwoDCut1(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {}
+    virtual bool passes(const Event&) override;
+
+  private:
+    float min_deltaR_, min_pTrel_;
+  };
+
+  ////////////////////////////////////////////////////////////////
 
 }

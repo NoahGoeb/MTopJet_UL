@@ -67,6 +67,7 @@ protected:
   std::unique_ptr<uhh2::Selection> GenMuonPT;
   std::unique_ptr<uhh2::Selection> GenElecPT;
   std::unique_ptr<uhh2::Selection> pv_sel;
+  std::unique_ptr<uhh2::Selection> twodcut_sel;
   std::unique_ptr<uhh2::Selection> trigger_mu_A;
   std::unique_ptr<uhh2::Selection> trigger_mu_B;
   std::unique_ptr<uhh2::Selection> trigger_el_A;
@@ -216,6 +217,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
   elec_sel_triggerA.reset(new NElectronSelection(1, 1, eleid_iso55));
   elec_sel_120.reset(new NElectronSelection(1, 1, eleid_noiso120));
+  twodcut_sel.reset(new TwoDCut1(0.4, 40));
 
   //// TRIGGER
   trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
@@ -279,6 +281,14 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   if(channel_ == elec) pass_lepsel = elec_etaveto->passes(event);
   bool pass_met = met_sel->passes(event);
   bool pass_prim_vert = pv_sel->passes(event);
+
+  // cut on fatjet pt
+  bool pass_fatpt=false;
+  std::vector<TopJet> jets = event.get(h_fatjets);
+  double ptcut = 200;
+  for(auto jet: jets){
+    if(jet.pt() > ptcut) pass_fatpt = true;
+  }
 
   //// TRIGGER
   bool pass_lep_trigger = false;
@@ -365,15 +375,28 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   pass_lep_trigger = pass_mu_trigger && pass_elec_trigger;
 
-  // cut on fatjet pt
-  bool pass_fatpt=false;
-  std::vector<TopJet> jets = event.get(h_fatjets);
-  double ptcut = 200;
-  for(auto jet: jets){
-    if(jet.pt() > ptcut) pass_fatpt = true;
+  //// lepton-2Dcut variables
+  bool pass_twodcut  = twodcut_sel->passes(event);
+
+  for(auto& muo : *event.muons){
+    float    dRmin, pTrel;
+    std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
+
+    muo.set_tag(Muon::twodcut_dRmin, dRmin);
+    muo.set_tag(Muon::twodcut_pTrel, pTrel);
   }
 
-  if(pass_lep_number && pass_met && pass_lepsel && pass_fatpt && pass_prim_vert && pass_lep_trigger) passed_recsel = true;
+  for(auto& ele : *event.electrons){
+
+    float    dRmin, pTrel;
+    std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
+
+    ele.set_tag(Electron::twodcut_dRmin, dRmin);
+    ele.set_tag(Electron::twodcut_pTrel, pTrel);
+  }
+  if(elec_is_isolated) pass_twodcut = true; // do not do 2D cut for isolated electrons
+
+  if(pass_lep_number && pass_met && pass_lepsel && pass_fatpt && pass_prim_vert && pass_lep_trigger && pass_twodcut) passed_recsel = true;
   else passed_recsel = false;
 
   //// EVNET SELECTION GEN
