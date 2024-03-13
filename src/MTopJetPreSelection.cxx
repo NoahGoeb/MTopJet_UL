@@ -52,6 +52,7 @@ protected:
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
   std::unique_ptr<CommonModules>   common;
   std::unique_ptr<JetCleaner> jet_cleaner1;
+  std::unique_ptr<JetCleaner> jet_cleaner2;
 
   // selections
   std::unique_ptr<uhh2::Selection> lumi_sel;
@@ -202,6 +203,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   common->init(ctx);
   
   jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
+  jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
 
   //// EVENT SELECTION REC
   met_sel.reset(new METCut(50 , uhh2::infinity));
@@ -395,6 +397,10 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
     ele.set_tag(Electron::twodcut_pTrel, pTrel);
   }
   if(elec_is_isolated) pass_twodcut = true; // do not do 2D cut for isolated electrons
+
+  //// SECOND CLEANER
+  jet_cleaner2->process(event);
+  sort_by_pt<Jet>(*event.jets);
 
   if(pass_lep_number && pass_met && pass_lepsel && pass_fatpt && pass_prim_vert && pass_lep_trigger && pass_twodcut) passed_recsel = true;
   else passed_recsel = false;
