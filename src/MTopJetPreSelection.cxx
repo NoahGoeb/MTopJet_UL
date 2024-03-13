@@ -61,12 +61,17 @@ protected:
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
   std::unique_ptr<uhh2::Selection> elec_etaveto;
+  std::unique_ptr<uhh2::Selection> elec_sel_120;
+  std::unique_ptr<uhh2::Selection> elec_sel_triggerA;
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
   std::unique_ptr<uhh2::Selection> GenMuonPT;
   std::unique_ptr<uhh2::Selection> GenElecPT;
   std::unique_ptr<uhh2::Selection> pv_sel;
   std::unique_ptr<uhh2::Selection> trigger_mu_A;
   std::unique_ptr<uhh2::Selection> trigger_mu_B;
+  std::unique_ptr<uhh2::Selection> trigger_el_A;
+  std::unique_ptr<uhh2::Selection> trigger_el_B;
+  std::unique_ptr<uhh2::Selection> trigger_el_C;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -80,11 +85,13 @@ protected:
   // bools
   bool isMC;
   bool isTTbar;
+  bool isElectronStream;
+  bool isPhotonStream;
   bool debug;
 
-  bool year_16 = false;
-  bool year_17 = false;
-  bool year_18 = true;
+  bool year_16;
+  bool year_17;
+  bool year_18;
   
 };
 
@@ -103,6 +110,9 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   //// YEARSWITCHER
   year = extract_year(ctx); // Ask for the year of Event
 
+  year_16 = false;
+  year_17 = false;
+  year_18 = false;
   if(year == Year::is2016v3) year_16 = true;
   else if(year == Year::isUL17) year_17 = true;
   else if(year == Year::isUL18) year_18 = true;
@@ -116,6 +126,15 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   TString dataset_version = (TString) ctx.get("dataset_version");
   if(dataset_version.Contains("TTbar") || dataset_version.Contains("TTTo")) isTTbar = true;
   else  isTTbar = false;
+
+  if(dataset_version.Contains("SingleElec")) isElectronStream = true;
+  else isElectronStream = false;
+
+  if(dataset_version.Contains("SinglePhoton")) isPhotonStream = true;
+  else isPhotonStream = false;
+
+  if(isElectronStream) cout << "ELECTRON STREAM DETECTED" << endl;
+  if(isPhotonStream)   cout << "PHOTON STREAM DETECTED" << endl;
 
   const std::string& channel = ctx.get("channel", "");
   if     (channel == "muon") channel_ = muon;
@@ -159,12 +178,16 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
 
   //// IDs
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
-  ElectronId eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronTagID(Electron::cutBasedElectronID_Fall17_94X_V2_tight));
+  ElectronId eleid_noiso55;
+  if(year_16) eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronTagID(Electron::mvaEleID_Spring16_GeneralPurpose_V1_wp90));
+  else        eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronTagID(Electron::mvaEleID_Fall17_noIso_V2_wp90));
+  ElectronId eleid_noiso120;
+  if(year_16) eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronTagID(Electron::mvaEleID_Spring16_GeneralPurpose_V1_wp90));
+  else        eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronTagID(Electron::mvaEleID_Fall17_noIso_V2_wp90));
+  ElectronId eleid_iso55;
+  if(year_16)   eleid_iso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronTagID(Electron::mvaEleID_Spring16_GeneralPurpose_V1_wp90));
+  else          eleid_iso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronTagID(Electron::mvaEleID_Fall17_iso_V2_wp90));
   JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
-
-  //// TRIGGER
-  trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
-  trigger_mu_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
 
   //// CLEANER
   muoSR_cleaner.reset(new     MuonCleaner(muid));
@@ -191,6 +214,18 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   }
   elec_etaveto.reset(new ElectronEtaVeto(1.44, 1.57));
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
+  elec_sel_triggerA.reset(new NElectronSelection(1, 1, eleid_iso55));
+  elec_sel_120.reset(new NElectronSelection(1, 1, eleid_noiso120));
+
+  //// TRIGGER
+  trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
+  trigger_mu_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
+  if(year_16)      trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele27_WPTight_Gsf_v*");
+  else if(year_17) trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele35_WPTight_Gsf_v*");
+  else if(year_18) trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele32_WPTight_Gsf_v*");
+  trigger_el_B = uhh2::make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*");
+  if(year_16) trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
+  else        trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon200_v*");
 
   //// EVENTS SELECTION GEN
   SemiLepDecay.reset(new TTbarSemilep(ctx));
@@ -248,6 +283,13 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   //// TRIGGER
   bool pass_lep_trigger = false;
   bool pass_mu_trigger = false;
+  bool pass_elec_trigger = true;
+
+  bool elec_is_isolated = false;
+
+  // for DATA until run 274954 -> use only Trigger A
+  // for MC and DATA from 274954 -> use "A || B"
+  // HLT_TkMu50_v is not availible for 2017&18. Alternative still needs to be inlcuded !!!!!!!!!!!!!!!!
   if(channel_ == muon){
     if(year_16){
       if(!isMC && event.run < 274954){
@@ -261,8 +303,67 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
       pass_mu_trigger = trigger_mu_A->passes(event);
     }
   }
+  // only use triggerA and isolation if elec pt < 120
+  // for pt > 120 use triggerB || triggerC
+  else if(channel_ == elec){
+    // pt < 120
+    if(!elec_sel_120->passes(event)){
+      if(isPhotonStream) pass_elec_trigger = false;
+      if(!trigger_el_A->passes(event))      pass_elec_trigger = false;
+      if(!elec_sel_triggerA->passes(event)) pass_elec_trigger = false;
+      if(pass_elec_trigger) elec_is_isolated = true;
+    }
+    // pt > 120
+    else{
+      // MC: A || B
+      if(isMC){
+        if(!trigger_el_B->passes(event) && !trigger_el_C->passes(event)) pass_elec_trigger = false;
+      }
+      // DATA 2016: if elec B, if photon !B && C
+       else{
+        if(year_16){
+          if(isPhotonStream){
+            if(trigger_el_B->passes(event))  pass_elec_trigger = false;
+            if(!trigger_el_C->passes(event))  pass_elec_trigger = false;
+          }
+          else if(isElectronStream){
+            if(!trigger_el_B->passes(event))  pass_elec_trigger = false;
+          }
+        }
+        // DATA 2017: if elec B, if photon !B && C
+        else if(year_17){
+          // Trigger B does not exist in 2017B, so use A here
+        if(event.run <= 299329){
+            if(isPhotonStream){
+              if(trigger_el_A->passes(event))  pass_elec_trigger = false;
+              if(!trigger_el_C->passes(event))  pass_elec_trigger = false;
+            }
+            else if(isElectronStream){
+              if(!trigger_el_A->passes(event))  pass_elec_trigger = false;
+              if(!elec_sel_triggerA->passes(event)) pass_elec_trigger = false;
+              if(pass_elec_trigger) elec_is_isolated = true;
+            }
+          }
+          // For all other runs, same as in 2016
+          else{
+            if(isPhotonStream){
+              if(trigger_el_B->passes(event))  pass_elec_trigger = false;
+              if(!trigger_el_C->passes(event))  pass_elec_trigger = false;
+            }
+            else if(isElectronStream){
+              if(!trigger_el_B->passes(event))  pass_elec_trigger = false;
+            }
+          }
+        }
+        // DATA 2018: B || C
+        else if(year_18){
+          if(!trigger_el_B->passes(event) && !trigger_el_C->passes(event)) pass_elec_trigger = false;
+        }
+      }
+    }
+  }
 
-  pass_lep_trigger = pass_mu_trigger;
+  pass_lep_trigger = pass_mu_trigger && pass_elec_trigger;
 
   // cut on fatjet pt
   bool pass_fatpt=false;
