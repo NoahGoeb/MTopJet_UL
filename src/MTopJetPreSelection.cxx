@@ -82,8 +82,10 @@ protected:
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
   Event::Handle<std::vector<TopJet>>h_fatjets;
+  Event::Handle<std::vector<GenTopJet>>h_genfatjets;
 
   Year year;
+  uint nJets;
 
   // bools
   bool isMC;
@@ -109,9 +111,12 @@ protected:
 MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
 
   debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
+  nJets = atoi(ctx.get("nJets","2").c_str()); // look for nJets, expect 2 if not found
 
   //// YEARSWITCHER
   year = extract_year(ctx); // Ask for the year of Event
+
+  cout << "post extract_year" << endl;
 
   year_16 = false;
   year_17 = false;
@@ -157,9 +162,13 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
 
   h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
+  h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
+  if(nJets == 3) {
+    h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone3TopJets");//unfortunate naming, but genXCone3TopJets has 3 clusterd fatjets, while genXCone33TopJets has 2 fatjets
+    cout << "new genfatjets handle" << endl;
+  }
 
   //// COMMON MODULES
-  
   if(debug) cout << "Common Modules" << endl;
 
   if(!isMC) lumi_sel.reset(new LumiSelection(ctx));
@@ -254,13 +263,25 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   if(debug) cout << "Start Module - Process" << endl;
 
+  // get Rec and Gen jets
+  std::vector<TopJet> jets = event.get(h_fatjets);
+  std::vector<GenTopJet> genJets = event.get(h_genfatjets);
+
+  // check number of jets
+  if(jets.size() < nJets) return false;
+  if(!event.isRealData){
+    if(genJets.size() < nJets) return false;
+  }
+
+  if(debug) cout << "luminosity sections and GEN M-ttbar selection" << endl;
+
   /* CMS-certified luminosity sections */
   if(event.isRealData){
     if(!lumi_sel->passes(event)) return false;
   }
 
+  /* GEN M-ttbar selection */
   if(!event.isRealData){
-    /* GEN M-ttbar selection */
     ttgenprod->process(event);
     if(!genmttbar_sel->passes(event)) return false;
   }
@@ -288,7 +309,6 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   // cut on fatjet pt
   bool pass_fatpt=false;
-  std::vector<TopJet> jets = event.get(h_fatjets);
   double ptcut = 200;
   for(auto jet: jets){
     if(jet.pt() > ptcut) pass_fatpt = true;
