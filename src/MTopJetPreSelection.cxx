@@ -23,18 +23,12 @@
 #include <UHH2/common/include/ElectronIds.h>
 #include <UHH2/common/include/YearRunSwitchers.h>
 
-// Hists
-#include <UHH2/common/include/ElectronHists.h>
-#include <UHH2/common/include/EventHists.h>
-#include <UHH2/common/include/MuonHists.h>
-#include <UHH2/common/include/JetHists.h>
-#include <UHH2/common/include/TTbarGenHists.h>
-#include <UHH2/MTopJet_UL/include/MTopJetHists.h>
 //
 #include <UHH2/MTopJet_UL/include/ModuleBASE.h>
 #include <UHH2/MTopJet_UL/include/RecoSelections.h>
 #include <UHH2/MTopJet_UL/include/GenSelections.h>
 #include <UHH2/MTopJet_UL/include/RemoveLepton.h>
+#include <UHH2/MTopJet_UL/include/AnalysisOutput.h>
 
 using namespace std;
 
@@ -86,6 +80,9 @@ protected:
   Event::Handle<bool>h_gensel;
   Event::Handle<std::vector<TopJet>>h_fatjets;
   Event::Handle<std::vector<GenTopJet>>h_genfatjets;
+
+  //write output
+  std::unique_ptr<uhh2::AnalysisModule> output;
 
   Year year;
   uint nJets;
@@ -257,6 +254,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
     if(nJets == 2) remove_lepton_gen.reset(new RemoveLeptonGen(ctx, "genXCone33TopJets"));
     else if(nJets == 3) remove_lepton_gen.reset(new RemoveLeptonGen(ctx, "genXCone3TopJets"));
   }
+  output.reset(new WriteOutput(ctx));
 
 }
 
@@ -467,6 +465,8 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   if(isTTbar){
     remove_lepton_gen->process(event);
   }
+
+  output->process(event);
 
   event.set(h_recsel, passed_recsel);
   event.set(h_gensel, passed_gensel);
