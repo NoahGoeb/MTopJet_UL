@@ -34,6 +34,7 @@
 #include <UHH2/MTopJet_UL/include/ModuleBASE.h>
 #include <UHH2/MTopJet_UL/include/RecoSelections.h>
 #include <UHH2/MTopJet_UL/include/GenSelections.h>
+#include <UHH2/MTopJet_UL/include/RemoveLepton.h>
 
 using namespace std;
 
@@ -55,8 +56,10 @@ protected:
   std::unique_ptr<JetCleaner> jet_cleaner2;
 
   // selections
-  std::unique_ptr<uhh2::Selection> lumi_sel;
+  std::unique_ptr<uhh2::AnalysisModule> remove_lepton_rec;
+  std::unique_ptr<uhh2::AnalysisModule> remove_lepton_gen;
 
+  std::unique_ptr<uhh2::Selection> lumi_sel;
   std::unique_ptr<uhh2::Selection> genmttbar_sel;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> muon_sel;
@@ -165,7 +168,6 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
   if(nJets == 3) {
     h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone3TopJets");//unfortunate naming, but genXCone3TopJets has 3 clusterd fatjets, while genXCone33TopJets has 2 fatjets
-    cout << "new genfatjets handle" << endl;
   }
 
   //// COMMON MODULES
@@ -247,6 +249,13 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   if(isMC){
     GenMuonPT.reset(new GenMuonSel(ctx, 55.));
     GenElecPT.reset(new GenElecSel(ctx, 55.));
+  }
+
+  //// PRODUCER
+  remove_lepton_rec.reset(new RemoveLepton(ctx, "xconeCHS"));
+  if(isMC) {
+    if(nJets == 2) remove_lepton_gen.reset(new RemoveLeptonGen(ctx, "genXCone33TopJets"));
+    else if(nJets == 3) remove_lepton_gen.reset(new RemoveLeptonGen(ctx, "genXCone3TopJets"));
   }
 
 }
@@ -452,6 +461,12 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   else passed_gensel = false;
 
   if(!passed_recsel && !passed_gensel) return false;
+
+  //// PRODUCER
+  remove_lepton_rec->process(event);
+  if(isTTbar){
+    remove_lepton_gen->process(event);
+  }
 
   event.set(h_recsel, passed_recsel);
   event.set(h_gensel, passed_gensel);
