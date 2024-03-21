@@ -81,6 +81,8 @@ protected:
   Event::Handle<std::vector<TopJet>>h_fatjets;
   Event::Handle<std::vector<GenTopJet>>h_genfatjets;
 
+  Event::Handle<bool> h_passed_gensel;
+
   //write output
   std::unique_ptr<uhh2::AnalysisModule> output;
 
@@ -115,8 +117,6 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
 
   //// YEARSWITCHER
   year = extract_year(ctx); // Ask for the year of Event
-
-  cout << "post extract_year" << endl;
 
   year_16 = false;
   year_17 = false;
@@ -256,6 +256,8 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   }
   output.reset(new WriteOutput(ctx));
 
+  h_passed_gensel = ctx.get_handle<bool>("isRealData");
+
 }
 
 /*
@@ -270,6 +272,8 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   if(debug) cout << "Start Module - Process" << endl;
 
+  bool test = event.get(h_passed_gensel);
+
   // get Rec and Gen jets
   std::vector<TopJet> jets = event.get(h_fatjets);
   std::vector<GenTopJet> genJets = event.get(h_genfatjets);
@@ -280,12 +284,14 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
     if(genJets.size() < nJets) return false;
   }
 
-  if(debug) cout << "luminosity sections and GEN M-ttbar selection" << endl;
+  if(debug) cout << "luminosity sections" << endl;
 
   /* CMS-certified luminosity sections */
   if(event.isRealData){
     if(!lumi_sel->passes(event)) return false;
   }
+
+  if(debug) cout << "GEN M-ttbar selection" << endl;
 
   /* GEN M-ttbar selection */
   if(!event.isRealData){
@@ -299,6 +305,8 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   eleSR_cleaner->process(event);
   if(event.electrons->size() > 0) sort_by_pt<Electron>(*event.electrons);
+
+  if(debug) cout << "common module" << endl;
 
   if(!common->process(event)) return false;
 

@@ -1,20 +1,18 @@
 <!-- <?xml version="1.0" encoding="UTF-8"?> -->
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 
-<!ENTITY NEVT "100">
+<!ENTITY NEVT "-1">
 
 <!ENTITY channel "muon">
 
-<!ENTITY debug "false">
-
-<!ENTITY nJets "2">
+<!ENTITY debug "true">
 
 <!ENTITY INdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PreSelection/UL">
 <!ENTITY OUTdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PostSelection/UL">
 
 
 <!-- =============================================== ttbar =========================================================================== -->
-<!ENTITY Test    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Test_UL18.root">
+<!ENTITY Test    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Test_Mtt1000toInft_UL18.root">
 ]>
 
 <!--
@@ -30,7 +28,7 @@
   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="59740">
     <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
 
-<InputData Version="TTbar_Test_UL18" Lumi="169042554.76" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_Test_Mtt1000toInft_UL18" Lumi="169042554.76" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&Test;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 <!-- ================================================================================================================================== -->
@@ -48,7 +46,7 @@
   <Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/>
   <Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop" />
 
-  <Item Name="additionalBranches" Value="weight xconeCHS genXCone33TopJets genXCone3TopJets"/>
+  <Item Name="additionalBranches" Value="passed_gensel passed_recsel weight xconeCHS genXCone33TopJets genXCone3TopJets"/>
 
   <Item Name="METName"                 Value="slimmedMETs"/>
 
@@ -60,7 +58,6 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
   <Item Name="Debug" Value="&debug;"/>
-  <Item Name="nJets" Value="&nJets;"/>
 
   <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/BTagMCEfficiencyHists_2018_muon.root"/>
   <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/DeepJet_102XSF_V2.csv" />

@@ -1,4 +1,5 @@
 #include <UHH2/MTopJet_UL/include/CombineXCone.h>
+
 #include "TLorentzVector.h"
 
 GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<GenJet> subjets, double ptmin, double etamax){
@@ -33,14 +34,14 @@ GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<GenJet> subjets, doub
 
 
 // Get final Jets from 3+3 Method on Gen level
-CombineXCone33_gen::CombineXCone33_gen(uhh2::Context & ctx, bool isTTbar, const std::string & name_had, const std::string & name_lep):
-h_GENxcone33hadjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_had)),
-h_GENxcone33lepjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_lep)),
+CombineXCone2_gen::CombineXCone2_gen(uhh2::Context & ctx, bool isTTbar, const std::string & name_had, const std::string & name_lep):
+h_GENxcone2hadjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_had)),
+h_GENxcone2lepjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_lep)),
 h_GENfatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets")),
 h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
 isTTbar_ (isTTbar) {}
 
-bool CombineXCone33_gen::process(uhh2::Event & event){
+bool CombineXCone2_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   //--------------------------------- get subjets and lepton ------------------------------
   //---------------------------------------------------------------------------------------
@@ -91,8 +92,8 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   //--------------------------------- Write Jets ------------------------------------------
   //---------------------------------------------------------------------------------------
-  event.set(h_GENxcone33hadjets, hadjets);
-  event.set(h_GENxcone33lepjets, lepjets);
+  event.set(h_GENxcone2hadjets, hadjets);
+  event.set(h_GENxcone2lepjets, lepjets);
 
   // delete combine;
   return true;

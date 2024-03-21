@@ -14,6 +14,7 @@
 
 #include <UHH2/MTopJet_UL/include/ModuleBASE.h>
 #include <UHH2/MTopJet_UL/include/CombineXCone.h>
+#include <UHH2/MTopJet_UL/include/GenHists.h>
 
 #include <vector>
 
@@ -31,8 +32,13 @@ public:
 
 protected:
 
+  Event::Handle<bool> h_passed_gensel;
+
+  //Define Histograms
+  unique_ptr<Hists> h_GEN_XCone2;
+
   //Object construction
-  std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod33_gen;
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod2_gen;
 
   //global variables for class
   bool debug;
@@ -41,6 +47,10 @@ protected:
 
 void MTopJetPostSelection::init_handels(uhh2::Context& ctx){
 
+  if(debug) cout << "--- Start Module - init handles ---" << endl;
+
+  h_passed_gensel = ctx.get_handle<bool>("passed_gensel");
+
 }
 
 void MTopJetPostSelection::declare_output(uhh2::Context& ctx){
@@ -48,6 +58,8 @@ void MTopJetPostSelection::declare_output(uhh2::Context& ctx){
 }
 
 void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
+
+  h_GEN_XCone2.reset(new GenHists(ctx, "gen_XCone_2", "GEN_XCone_2_had_Combined"));
 
 }
 
@@ -66,7 +78,7 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   const std::string ttbar_gen_label("ttbargen");
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
-  jetprod33_gen.reset(new CombineXCone33_gen(ctx, true, "GEN_XCone33_had_Combined", "GEN_XCone33_lep_Combined"));
+  jetprod2_gen.reset(new CombineXCone2_gen(ctx, true, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
 
 }
 
@@ -76,7 +88,21 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   if(debug) cout << "\t--- Construct Obects" << endl;
 
   ttgenprod->process(event);
-  jetprod33_gen->process(event);
+  jetprod2_gen->process(event);
+
+  if(debug) cout << "\t--- get passed gensel" << endl;
+
+  bool passed_gensel = event.get(h_passed_gensel);
+
+  // Run selection for single events
+  if(debug) cout << "\t--- Run Selection" << endl;
+
+  bool pass_measurement2_gen = false;
+
+  pass_measurement2_gen = passed_gensel;
+
+  // fill Hists
+  if(pass_measurement2_gen) h_GEN_XCone2->fill(event);
 
   return true;
 }
