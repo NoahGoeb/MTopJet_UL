@@ -31,8 +31,10 @@ public:
 
 protected:
 
+  Event::Handle<bool> h_passed_gensel;
+
   //Object construction
-  std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod33_gen;
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod2_gen;
 
   //global variables for class
   bool debug;
@@ -40,6 +42,10 @@ protected:
 };
 
 void MTopJetPostSelection::init_handels(uhh2::Context& ctx){
+
+  if(debug) cout << "--- Start Module - init handles ---" << endl;
+
+  h_passed_gensel = ctx.get_handle<bool>("passed_gensel");
 
 }
 
@@ -66,7 +72,12 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   const std::string ttbar_gen_label("ttbargen");
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
-  jetprod33_gen.reset(new CombineXCone33_gen(ctx, true, "GEN_XCone33_had_Combined", "GEN_XCone33_lep_Combined"));
+  jetprod2_gen.reset(new CombineXCone2_gen(ctx, true, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
+
+  // Initiate input and output
+  if(debug) cout << "\t--- Initiate input and output" << endl;
+  init_handels(ctx);
+  init_MC_hists(ctx);
 
 }
 
@@ -76,7 +87,18 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   if(debug) cout << "\t--- Construct Obects" << endl;
 
   ttgenprod->process(event);
-  jetprod33_gen->process(event);
+  jetprod2_gen->process(event);
+
+  if(debug) cout << "\t--- get passed gensel" << endl;
+
+  bool passed_gensel = event.get(h_passed_gensel);
+
+  // Run selection for single events
+  if(debug) cout << "\t--- Run Selection" << endl;
+
+  bool pass_measurement2_gen = false;
+
+  pass_measurement2_gen = passed_gensel;
 
   return true;
 }
