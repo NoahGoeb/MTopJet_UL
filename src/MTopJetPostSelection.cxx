@@ -14,6 +14,7 @@
 
 #include <UHH2/MTopJet_UL/include/ModuleBASE.h>
 #include <UHH2/MTopJet_UL/include/CombineXCone.h>
+#include <UHH2/MTopJet_UL/include/GenHists.h>
 
 #include <vector>
 
@@ -32,6 +33,9 @@ public:
 protected:
 
   Event::Handle<bool> h_passed_gensel;
+
+  //Define Histograms
+  unique_ptr<Hists> h_GEN_XCone2;
 
   //Object construction
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod2_gen;
@@ -54,6 +58,8 @@ void MTopJetPostSelection::declare_output(uhh2::Context& ctx){
 }
 
 void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
+
+  h_GEN_XCone2.reset(new GenHists(ctx, "gen_XCone_2", "GEN_XCone_2_had_Combined"));
 
 }
 
@@ -99,6 +105,9 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   bool pass_measurement2_gen = false;
 
   pass_measurement2_gen = passed_gensel;
+
+  // fill Hists
+  if(pass_measurement2_gen) h_GEN_XCone2->fill(event);
 
   return true;
 }
