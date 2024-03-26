@@ -29,6 +29,17 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   GenJetMass = book<TH1F>("GenJet_Mass", "M_{jet}", n_massbins, 0, max_m);
   GenJetNumber = book<TH1F>("GenJet_Number", "N_{jets}", 5, 0, 4);
 
+  GenJetTau1 = book<TH1F>("GenJet_Tau1", "Tau1_{jet}", 50, 0, 1);
+  GenJetTau2 = book<TH1F>("GenJet_Tau2", "Tau2_{jet}", 50, 0, 1);
+  GenJetTau3 = book<TH1F>("GenJet_Tau3", "Tau3_{jet}", 50, 0, 1);
+  GenJetTau4 = book<TH1F>("GenJet_Tau4", "Tau4_{jet}", 50, 0, 1);
+
+  GenJetTau2Tau1 = book<TH1F>("GenJet_Tau2Tau1", "(Tau2/Tau1)_{jet}", 50, 0, 1);
+  GenJetTau3Tau2 = book<TH1F>("GenJet_Tau3Tau2", "(Tau3/Tau2)_{jet}", 50, 0, 1);
+  GenJetTau3Tau1 = book<TH1F>("GenJet_Tau3Tau1", "(Tau3/Tau1)_{jet}", 50, 0, 1);
+  GenJetTau4Tau3 = book<TH1F>("GenJet_Tau4Tau3", "(Tau4/Tau3)_{jet}", 50, 0, 1);
+  GenJetTau4Tau2 = book<TH1F>("GenJet_Tau4Tau2", "(Tau4/Tau2)_{jet}", 50, 0, 1);
+  GenJetTau4Tau1 = book<TH1F>("GenJet_Tau4Tau1", "(Tau4/Tau1)_{jet}", 50, 0, 1);
 
   // handle for clustered jets
   h_jets=ctx.get_handle<std::vector<GenTopJet>>(jetname);
@@ -66,6 +77,19 @@ void GenHists::fill(const Event & event){
 
   if(jets.size() > 0) {
     GenJetMass->Fill(jets_v4.at(0).M(), genweight);
+
+    GenJetTau1->Fill(jets.at(0).tau1(), genweight);
+    GenJetTau2->Fill(jets.at(0).tau2(), genweight);
+    GenJetTau3->Fill(jets.at(0).tau3(), genweight);
+    GenJetTau4->Fill(jets.at(0).tau4(), genweight);
+
+    if(jets.at(0).tau1() != 0) GenJetTau2Tau1->Fill(jets.at(0).tau2()/jets.at(0).tau1(), genweight);
+    if(jets.at(0).tau2() != 0) GenJetTau3Tau2->Fill(jets.at(0).tau3()/jets.at(0).tau2(), genweight);
+    if(jets.at(0).tau1() != 0) GenJetTau3Tau1->Fill(jets.at(0).tau3()/jets.at(0).tau1(), genweight);
+    if(jets.at(0).tau3() != 0) GenJetTau4Tau3->Fill(jets.at(0).tau4()/jets.at(0).tau3(), genweight);
+    if(jets.at(0).tau2() != 0) GenJetTau4Tau2->Fill(jets.at(0).tau4()/jets.at(0).tau2(), genweight);
+    if(jets.at(0).tau1() != 0) GenJetTau4Tau1->Fill(jets.at(0).tau4()/jets.at(0).tau1(), genweight);
+
   }
 
   

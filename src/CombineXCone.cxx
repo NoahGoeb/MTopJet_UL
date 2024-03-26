@@ -84,6 +84,25 @@ bool CombineXCone2_gen::process(uhh2::Event & event){
   std::vector<GenJet> subjets_had = fathadjet.subjets();
   GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0, 2.5);
   GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0, 2.5);
+  //-------- set subjettines variables ----------------------------------------------------
+  lepjet.set_tau1(fatlepjet.tau1());
+  lepjet.set_tau2(fatlepjet.tau2());
+  lepjet.set_tau3(fatlepjet.tau3());
+  lepjet.set_tau4(fatlepjet.tau4());
+  lepjet.set_tau1_groomed(fatlepjet.tau1_groomed());
+  lepjet.set_tau2_groomed(fatlepjet.tau2_groomed());
+  lepjet.set_tau3_groomed(fatlepjet.tau3_groomed());
+  lepjet.set_tau4_groomed(fatlepjet.tau4_groomed());
+
+  hadjet.set_tau1(fathadjet.tau1());
+  hadjet.set_tau2(fathadjet.tau2());
+  hadjet.set_tau3(fathadjet.tau3());
+  hadjet.set_tau4(fathadjet.tau4());
+  hadjet.set_tau1_groomed(fathadjet.tau1_groomed());
+  hadjet.set_tau2_groomed(fathadjet.tau2_groomed());
+  hadjet.set_tau3_groomed(fathadjet.tau3_groomed());
+  hadjet.set_tau4_groomed(fathadjet.tau4_groomed());
+
   vector<GenTopJet> hadjets;
   vector<GenTopJet> lepjets;
   hadjets.push_back(hadjet);

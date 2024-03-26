@@ -25,6 +25,10 @@ protected:
     TH1F *GenJetMass;
     TH1F *GenJetNumber;
 
+    TH1F *GenJetTau1, *GenJetTau2, *GenJetTau3, *GenJetTau4;
+
+    TH1F *GenJetTau2Tau1, *GenJetTau3Tau2, *GenJetTau3Tau1, *GenJetTau4Tau3, *GenJetTau4Tau2, *GenJetTau4Tau1;
+
     uhh2::Event::Handle<std::vector<GenTopJet>>h_jets;
 
     bool debug;
