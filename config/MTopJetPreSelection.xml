@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+
 <!ENTITY NEVT "100">
+
+<!ENTITY channel "muon">
+
+<!ENTITY debug "false">
+
+<!ENTITY nJets "2">
 
 <!-- JERC -->
 <!ENTITY JECSMEAR_DIRECTION         "nominal">  <!--nominal/down/up -->
@@ -8,8 +15,7 @@
 
 <!-- USER based variables -->
 <!ENTITY BASEdir  "/nfs/dust/cms/user/goebnoah/UHH2_UL_MTop/CMSSW_10_6_28/src/UHH2/">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PreSelection/UL/">
-<!ENTITY DEBUG    "false">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PreSelection/UL">
 
 <!-- MC PuReweighting -->
 <!ENTITY DO_PU_REWEIGHTING          "true">     <!-- true, false -->
@@ -81,7 +87,7 @@
     <Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/>
     <Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop" />
 
-	<Item Name="additionalBranches" Value="xconeCHS xconePuppi genXCone33TopJets genXCone33TopJets_softdrop genjetsAk8Substructure"/>
+	<Item Name="additionalBranches" Value="xconeCHS genXCone33TopJets genXCone3TopJets"/>
 
 
     <!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
@@ -105,11 +111,12 @@
     <Item Name="pileup_directory_data"          Value="&PILEUP_DIRECTORY_DATA;"/>       <!--used only in UHH2/common/include/MCWeight.h -->
     <Item Name="pileup_directory_data_up"       Value="&PILEUP_DIRECTORY_DATA_UP;"/>    <!--used only in UHH2/common/include/MCWeight.h -->
     <Item Name="pileup_directory_data_down"     Value="&PILEUP_DIRECTORY_DATA_DOWN;"/>  <!--used only in UHH2/common/include/MCWeight.h -->
+    <Item Name="channel" Value="&channel;"/>
+    <Item Name="nJets" Value="&nJets;"/>
 
-    <!-- MC PuReweighting -->
-    <Item Name="Debug" Value="&DEBUG;" />
+    <Item Name="Debug" Value="&debug;" />
 
-    <Item Name="AnalysisModule" Value="MTopJetModule"/>
+    <Item Name="AnalysisModule" Value="MTopJetPreSelection"/>
 
   </UserConfig>
 

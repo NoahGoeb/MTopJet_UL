@@ -48,7 +48,7 @@
   <Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/>
   <Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop" />
 
-  <Item Name="additionalBranches" Value="weight xconeCHS genXCone33TopJets genXCone3TopJets"/>
+  <Item Name="additionalBranches" Value="passed_gensel passed_recsel weight xconeCHS genXCone33TopJets genXCone3TopJets"/>
 
   <Item Name="METName"                 Value="slimmedMETs"/>
 
