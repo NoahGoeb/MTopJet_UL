@@ -32,6 +32,8 @@ public:
   void init_MC_hists(uhh2::Context& ctx);
 
 protected:
+  enum lepton { muon, elec };
+  lepton channel_;
 
   Event::Handle<bool> h_passed_gensel;
 
@@ -40,6 +42,7 @@ protected:
   unique_ptr<uhh2::Selection> pt10lep_2gensel;
   unique_ptr<uhh2::Selection> mass_2gensel;
   unique_ptr<uhh2::Selection> subjet_quality_2gensel;
+  unique_ptr<uhh2::Selection> lepton_sel_gen;
 
   //Define Histograms
   unique_ptr<Hists> h_GEN_XCone2;
@@ -81,6 +84,11 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
 
   if(debug) cout << "--- Start Module - CTX ---" << endl;
 
+  // channel
+  const std::string& channel = ctx.get("channel", ""); //define Channel
+  if     (channel == "muon") channel_ = muon;
+  else if(channel == "elec") channel_ = elec;
+
   // Construction
   const std::string ttbar_gen_label("ttbargen");
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
@@ -88,6 +96,11 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   jetprod2_gen.reset(new CombineXCone2_gen(ctx, true, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
 
   // Define Selections
+  if(channel_ == muon) {
+    lepton_sel_gen.reset(new GenMuonSel(ctx, 60.0));
+  } else {
+    lepton_sel_gen.reset(new GenElecSel(ctx, 60.0));
+  }
   pt400_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_had_Combined", 400));
   pt10lep_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_lep_Combined", 10));
   mass_2gensel.reset(new MassCut_gen(ctx, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
@@ -117,7 +130,7 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
 
   bool pass_measurement2_gen = false;
 
-  pass_measurement2_gen = passed_gensel && pt400_2gensel->passes(event) && pt10lep_2gensel->passes(event) && mass_2gensel->passes(event) && subjet_quality_2gensel->passes(event);
+  pass_measurement2_gen = passed_gensel && pt400_2gensel->passes(event) && pt10lep_2gensel->passes(event) && mass_2gensel->passes(event) && subjet_quality_2gensel->passes(event) && lepton_sel_gen->passes(event);
 
   // fill Hists
   if(pass_measurement2_gen) h_GEN_XCone2->fill(event);
