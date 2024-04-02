@@ -37,6 +37,7 @@ protected:
 
   //Selections
   unique_ptr<uhh2::Selection> pt400_2gensel;
+  unique_ptr<uhh2::Selection> pt10lep_2gensel;
 
   //Define Histograms
   unique_ptr<Hists> h_GEN_XCone2;
@@ -86,7 +87,7 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
 
   // Define Selections
   pt400_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_had_Combined", 400));
-  
+  pt10lep_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_lep_Combined", 10));
 
   // Initiate input and output
   if(debug) cout << "\t--- Initiate input and output" << endl;
@@ -112,7 +113,7 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
 
   bool pass_measurement2_gen = false;
 
-  pass_measurement2_gen = passed_gensel && pt400_2gensel->passes(event);
+  pass_measurement2_gen = passed_gensel && pt400_2gensel->passes(event) && pt10lep_2gensel->passes(event);
 
   // fill Hists
   if(pass_measurement2_gen) h_GEN_XCone2->fill(event);
