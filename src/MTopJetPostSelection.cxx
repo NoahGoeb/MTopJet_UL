@@ -15,6 +15,7 @@
 #include <UHH2/MTopJet_UL/include/ModuleBASE.h>
 #include <UHH2/MTopJet_UL/include/CombineXCone.h>
 #include <UHH2/MTopJet_UL/include/GenHists.h>
+#include <UHH2/MTopJet_UL/include/GenSelections.h>
 
 #include <vector>
 
@@ -33,6 +34,9 @@ public:
 protected:
 
   Event::Handle<bool> h_passed_gensel;
+
+  //Selections
+  unique_ptr<uhh2::Selection> pt400_2gensel;
 
   //Define Histograms
   unique_ptr<Hists> h_GEN_XCone2;
@@ -74,11 +78,15 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
 
   if(debug) cout << "--- Start Module - CTX ---" << endl;
 
-  //construction
+  // Construction
   const std::string ttbar_gen_label("ttbargen");
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   jetprod2_gen.reset(new CombineXCone2_gen(ctx, true, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
+
+  // Define Selections
+  pt400_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_had_Combined", 400));
+  
 
   // Initiate input and output
   if(debug) cout << "\t--- Initiate input and output" << endl;
@@ -104,7 +112,7 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
 
   bool pass_measurement2_gen = false;
 
-  pass_measurement2_gen = passed_gensel;
+  pass_measurement2_gen = passed_gensel && pt400_2gensel->passes(event);
 
   // fill Hists
   if(pass_measurement2_gen) h_GEN_XCone2->fill(event);

@@ -48,3 +48,21 @@ bool uhh2::GenElecSel::passes(const uhh2::Event& event){
 }
 
 ////////////////////////////////////////////////////////
+
+uhh2::LeadingJetPT_gen::LeadingJetPT_gen(uhh2::Context& ctx, const std::string & name, float ptcut):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+ptcut_(ptcut) {}
+
+bool uhh2::LeadingJetPT_gen::passes(const uhh2::Event& event){
+  bool pass_jetpt = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  GenTopJet jet1;
+  if(jets.size()>0){
+    jet1 = jets.at(0);
+    float pt = jet1.pt();
+    if(pt > ptcut_) pass_jetpt = true;
+  }
+  return pass_jetpt;
+}
+
+////////////////////////////////////////////////////////
