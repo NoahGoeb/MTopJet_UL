@@ -66,3 +66,29 @@ bool uhh2::LeadingJetPT_gen::passes(const uhh2::Event& event){
 }
 
 ////////////////////////////////////////////////////////
+
+uhh2::MassCut_gen::MassCut_gen(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
+h_hadjets(ctx.get_handle<std::vector<GenTopJet>>(hadname)),
+h_lepjets(ctx.get_handle<std::vector<GenTopJet>>(lepname)),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
+
+bool uhh2::MassCut_gen::passes(const uhh2::Event& event){
+  std::vector<GenTopJet> hadjets = event.get(h_hadjets);
+  std::vector<GenTopJet> lepjets = event.get(h_lepjets);
+  const auto & ttbargen = event.get(h_ttbargen);
+
+  GenParticle lepton = ttbargen.ChargedLepton();
+  bool is_semilep = ttbargen.IsSemiLeptonicDecay();
+
+  LorentzVector jet1_v4, jet2_v4;
+  bool pass_masscut = false;
+  if(hadjets.size()>0 && lepjets.size()>0){
+    jet1_v4 = hadjets.at(0).v4();
+    if(is_semilep) jet2_v4 = lepjets.at(0).v4() + lepton.v4();
+    else           jet2_v4 = lepjets.at(0).v4();
+    if(jet1_v4.M() > jet2_v4.M()) pass_masscut = true;
+  }
+  return pass_masscut;
+}
+
+////////////////////////////////////////////////////////
