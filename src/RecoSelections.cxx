@@ -28,7 +28,7 @@ bool uhh2::ElectronEtaVeto::passes(const uhh2::Event& event){
 
 ////////////////////////////////////////////////////////
 
-bool uhh2::TwoDCut1::passes(const uhh2::Event& event){
+bool uhh2::TwoDCut::passes(const uhh2::Event& event){
 
   if(event.muons->size() != 0 || event.electrons->size() != 0){
     assert(event.muons && event.electrons && event.jets);

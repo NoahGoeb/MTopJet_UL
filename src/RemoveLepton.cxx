@@ -128,13 +128,6 @@ bool RemoveLeptonGen::process(uhh2::Event & event){
     new_topjets.push_back(new_topjet);
   }
 
-  // cout << "----------------------------------------------" << endl;
-  // for(auto top:new_topjets){
-  //   cout << top.pt() << endl;
-  //   for(auto sub: top.subjets()) cout << sub.pt() << endl;
-  //   cout << "----------------" << endl;
-  // }
-
   event.set(h_topjets, new_topjets);
   return true;
 }

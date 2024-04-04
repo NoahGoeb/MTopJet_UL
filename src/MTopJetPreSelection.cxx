@@ -164,7 +164,8 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
   if(nJets == 3) {
-    h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone3TopJets");//unfortunate naming, but genXCone3TopJets has 3 clusterd fatjets, while genXCone33TopJets has 2 fatjets
+    //unfortunate naming, but genXCone3TopJets has 3 clusterd fatjets, while genXCone33TopJets has 2 fatjets
+    h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone3TopJets");
   }
 
   //// COMMON MODULES
@@ -228,7 +229,7 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
   elec_sel_triggerA.reset(new NElectronSelection(1, 1, eleid_iso55));
   elec_sel_120.reset(new NElectronSelection(1, 1, eleid_noiso120));
-  twodcut_sel.reset(new TwoDCut1(0.4, 40));
+  twodcut_sel.reset(new TwoDCut(0.4, 40));
   badhcal_sel.reset(new BadHCALSelection(ctx));
 
   //// TRIGGER
