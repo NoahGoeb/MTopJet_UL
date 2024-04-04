@@ -44,8 +44,14 @@ protected:
   unique_ptr<uhh2::Selection> subjet_quality_2gensel;
   unique_ptr<uhh2::Selection> lepton_sel_gen;
 
+  unique_ptr<uhh2::Selection> pt400_3gensel;
+  unique_ptr<uhh2::Selection> pt10lep_3gensel;
+  unique_ptr<uhh2::Selection> mass_3gensel;
+  unique_ptr<uhh2::Selection> subjet_quality_3gensel;
+
   //Define Histograms
   unique_ptr<Hists> h_GEN_XCone2;
+  unique_ptr<Hists> h_GEN_XCone3;
 
   //Object construction
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod2_gen, jetprod3_gen;
@@ -70,6 +76,7 @@ void MTopJetPostSelection::declare_output(uhh2::Context& ctx){
 void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
 
   h_GEN_XCone2.reset(new GenHists(ctx, "gen_XCone_2", "GEN_XCone_2_had_Combined"));
+  h_GEN_XCone3.reset(new GenHists(ctx, "gen_XCone_3", "GEN_XCone_3_had_Combined"));
 
 }
 
@@ -104,9 +111,14 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   }
   pt400_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_had_Combined", 400));
   pt10lep_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_lep_Combined", 10));
-  mass_2gensel.reset(new MassCut_gen(ctx, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
+  mass_2gensel.reset(new MassCut2_gen(ctx, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
   subjet_quality_2gensel.reset(new SubjetQuality_gen(ctx, "GEN_XCone_2_had_Combined", 30, 2.5));
   
+  pt400_3gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_3_had_Combined", 400));
+  pt10lep_3gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_3_lep_Combined", 10));
+  mass_3gensel.reset(new MassCut3_gen(ctx, "GEN_XCone_3_had_Combined", "GEN_XCone_3_lep_Combined", 1.2));
+  subjet_quality_3gensel.reset(new SubjetQuality_gen(ctx, "GEN_XCone_3_had_Combined", 30, 2.5));
+
   // Initiate input and output
   if(debug) cout << "\t--- Initiate input and output" << endl;
   init_handels(ctx);
@@ -131,11 +143,14 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   if(debug) cout << "\t--- Run Selection" << endl;
 
   bool pass_measurement2_gen = false;
+  bool pass_measurement3_gen = false;
 
   pass_measurement2_gen = passed_gensel && pt400_2gensel->passes(event) && pt10lep_2gensel->passes(event) && mass_2gensel->passes(event) && subjet_quality_2gensel->passes(event) && lepton_sel_gen->passes(event);
+  pass_measurement3_gen = passed_gensel && pt400_3gensel->passes(event) && pt10lep_3gensel->passes(event) && mass_3gensel->passes(event) && subjet_quality_3gensel->passes(event) && lepton_sel_gen->passes(event);
 
   // fill Hists
   if(pass_measurement2_gen) h_GEN_XCone2->fill(event);
+  if(pass_measurement3_gen) h_GEN_XCone3->fill(event);
 
   return true;
 }
