@@ -47,3 +47,68 @@ bool uhh2::GenElecSel::passes(const uhh2::Event& event){
 }
 
 ////////////////////////////////////////////////////////
+
+uhh2::LeadingJetPT_gen::LeadingJetPT_gen(uhh2::Context& ctx, const std::string & name, float ptcut):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+ptcut_(ptcut) {}
+
+bool uhh2::LeadingJetPT_gen::passes(const uhh2::Event& event){
+  bool pass_jetpt = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  GenTopJet jet1;
+  if(jets.size()>0){
+    jet1 = jets.at(0);
+    float pt = jet1.pt();
+    if(pt > ptcut_) pass_jetpt = true;
+  }
+  return pass_jetpt;
+}
+
+////////////////////////////////////////////////////////
+
+uhh2::MassCut_gen::MassCut_gen(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
+h_hadjets(ctx.get_handle<std::vector<GenTopJet>>(hadname)),
+h_lepjets(ctx.get_handle<std::vector<GenTopJet>>(lepname)),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
+
+bool uhh2::MassCut_gen::passes(const uhh2::Event& event){
+  std::vector<GenTopJet> hadjets = event.get(h_hadjets);
+  std::vector<GenTopJet> lepjets = event.get(h_lepjets);
+  const auto & ttbargen = event.get(h_ttbargen);
+
+  GenParticle lepton = ttbargen.ChargedLepton();
+  bool is_semilep = ttbargen.IsSemiLeptonicDecay();
+
+  LorentzVector jet1_v4, jet2_v4;
+  bool pass_masscut = false;
+  if(hadjets.size()>0 && lepjets.size()>0){
+    jet1_v4 = hadjets.at(0).v4();
+    if(is_semilep) jet2_v4 = lepjets.at(0).v4() + lepton.v4();
+    else           jet2_v4 = lepjets.at(0).v4();
+    if(jet1_v4.M() > jet2_v4.M()) pass_masscut = true;
+  }
+  return pass_masscut;
+}
+
+////////////////////////////////////////////////////////
+
+uhh2::SubjetQuality_gen::SubjetQuality_gen(uhh2::Context& ctx, const std::string & name, float ptmin_, float etamax_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+ptmin(ptmin_),
+etamax(etamax_){}
+
+bool uhh2::SubjetQuality_gen::passes(const uhh2::Event& event){
+  bool pass = true;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  if(jets.size() == 0) return false;
+  auto subjets = jets.at(0).subjets();
+  if(subjets.size() != 3) pass = false;
+  for(auto subjet: subjets){
+    if(subjet.pt() < ptmin) pass = false;
+    if(fabs(subjet.eta()) > etamax) pass = false;
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////
+

@@ -42,5 +42,40 @@ namespace uhh2 {
     double ptmin;
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
+
+  class LeadingJetPT_gen : public Selection {
+
+  public:
+    explicit LeadingJetPT_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float ptcut_;
+  };
+
+  class MassCut_gen : public Selection {
+
+  public:
+    explicit MassCut_gen(Context&, const std::string &, const std::string &);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_hadjets;
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_lepjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
+
+  class SubjetQuality_gen : public Selection {
+
+  public:
+    explicit SubjetQuality_gen(Context&, const std::string &, float, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float ptmin, etamax;
+  };
+  
   
 }
