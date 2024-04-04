@@ -48,7 +48,7 @@ protected:
   unique_ptr<Hists> h_GEN_XCone2;
 
   //Object construction
-  std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod2_gen;
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod, jetprod2_gen, jetprod3_gen;
 
   //global variables for class
   bool debug;
@@ -94,6 +94,7 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   jetprod2_gen.reset(new CombineXCone2_gen(ctx, true, "GEN_XCone_2_had_Combined", "GEN_XCone_2_lep_Combined"));
+  jetprod3_gen.reset(new CombineXCone3_gen(ctx, true, "GEN_XCone_3_had_Combined", "GEN_XCone_3_lep_Combined"));
 
   // Define Selections
   if(channel_ == muon) {
@@ -120,6 +121,7 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
 
   ttgenprod->process(event);
   jetprod2_gen->process(event);
+  jetprod3_gen->process(event);
 
   if(debug) cout << "\t--- get passed gensel" << endl;
 

@@ -117,3 +117,63 @@ bool CombineXCone2_gen::process(uhh2::Event & event){
   // delete combine;
   return true;
 }
+
+CombineXCone3_gen::CombineXCone3_gen(uhh2::Context & ctx, bool isTTbar, const std::string & name_had, const std::string & name_lep):
+h_GENxcone3hadjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_had)),
+h_GENxcone3lepjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_lep)),
+h_GENfatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone3TopJets")),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+isTTbar_ (isTTbar) {}
+
+bool CombineXCone3_gen::process(uhh2::Event & event){
+  //---------------------------------------------------------------------------------------
+  //--------------------------------- get subjets and lepton ------------------------------
+  //---------------------------------------------------------------------------------------
+  GenParticle lepton;
+  std::vector<GenTopJet> jets = event.get(h_GENfatjets);
+  CombineXCone* combine = new CombineXCone();
+  //---------------------------------------------------------------------------------------
+  //-------- set Lorentz Vectors of subjets and combine them ------------------------------
+  //---------------------------------------------------------------------------------------
+  std::vector<GenTopJet> combinedJets;
+  vector<GenTopJet> hadjets;
+  vector<GenTopJet> lepjets;
+  GenTopJet combinedJet;
+
+
+  if(isTTbar_) {
+    TTbarGen ttbargen = event.get(h_ttbargen);
+    if(ttbargen.IsSemiLeptonicDecay()) {
+      lepton = ttbargen.ChargedLepton();
+      for(uint i=0; i<jets.size(); i++) {
+        combinedJet = combine->CreateTopJetFromSubjets_gen(jets.at(i).subjets(), 0, 2.5);
+
+        combinedJet.set_tau1(jets.at(i).tau1());
+        combinedJet.set_tau2(jets.at(i).tau2());
+        combinedJet.set_tau3(jets.at(i).tau3());
+        combinedJet.set_tau4(jets.at(i).tau4());
+        combinedJet.set_tau1_groomed(jets.at(i).tau1_groomed());
+        combinedJet.set_tau2_groomed(jets.at(i).tau2_groomed());
+        combinedJet.set_tau3_groomed(jets.at(i).tau3_groomed());
+        combinedJet.set_tau4_groomed(jets.at(i).tau4_groomed());
+        
+        if(deltaR(lepton, jets.at(i)) > 1.2) {
+          hadjets.push_back(combinedJet);
+        } else if(deltaR(lepton, jets.at(i)) < 1.2) {
+          lepjets.push_back(combinedJet);
+        }
+      }
+    }
+  }
+
+  
+
+  //---------------------------------------------------------------------------------------
+  //--------------------------------- Write Jets ------------------------------------------
+  //---------------------------------------------------------------------------------------
+  event.set(h_GENxcone3hadjets, hadjets);
+  event.set(h_GENxcone3lepjets, lepjets);
+
+  // delete combine;
+  return true;
+}
