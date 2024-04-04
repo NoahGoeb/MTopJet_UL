@@ -24,6 +24,10 @@ GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<GenJet> subjets, doub
   return jet;
 }
 
+bool compareGenTopJetPt(GenTopJet jet1, GenTopJet jet2) {
+  return jet1.pt()>jet2.pt();
+}
+
 /*
 .██████  ███████ ███    ██
 ██       ██      ████   ██
@@ -131,6 +135,7 @@ bool CombineXCone3_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   GenParticle lepton;
   std::vector<GenTopJet> jets = event.get(h_GENfatjets);
+  if(jets.size() < 3) return false;
   CombineXCone* combine = new CombineXCone();
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of subjets and combine them ------------------------------
@@ -166,7 +171,9 @@ bool CombineXCone3_gen::process(uhh2::Event & event){
     }
   }
 
-  
+  //sort jet such that the first jet has the highest pt
+  std::sort(hadjets.begin(), hadjets.end(), compareGenTopJetPt);
+  std::sort(lepjets.begin(), lepjets.end(), compareGenTopJetPt);
 
   //---------------------------------------------------------------------------------------
   //--------------------------------- Write Jets ------------------------------------------
