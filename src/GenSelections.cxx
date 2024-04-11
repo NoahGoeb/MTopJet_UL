@@ -140,3 +140,18 @@ bool uhh2::SubjetQuality_gen::passes(const uhh2::Event& event){
 
 ////////////////////////////////////////////////////////
 
+uhh2::NoNearJet_gen::NoNearJet_gen(uhh2::Context& ctx, const std::string & name, float dR_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+dR(dR_){}
+
+bool uhh2::NoNearJet_gen::passes(const uhh2::Event& event){
+  bool pass = true;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  if(jets.size() > 1) {
+    if(deltaR(jets.at(0), jets.at(1)) < dR) pass = false;
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////
+

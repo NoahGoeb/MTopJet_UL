@@ -89,6 +89,17 @@ namespace uhh2 {
     uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
     float ptmin, etamax;
   };
+
+  class NoNearJet_gen : public Selection {
+
+  public:
+    explicit NoNearJet_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float dR;
+  };
   
   
 }

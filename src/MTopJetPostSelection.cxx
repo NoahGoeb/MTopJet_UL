@@ -48,6 +48,7 @@ protected:
   unique_ptr<uhh2::Selection> pt10lep_3gensel;
   unique_ptr<uhh2::Selection> mass_3gensel;
   unique_ptr<uhh2::Selection> subjet_quality_3gensel;
+  unique_ptr<uhh2::Selection> no_near_jet_3gensel;
 
   //Define Histograms
   unique_ptr<Hists> h_GEN_XCone2;
@@ -118,6 +119,7 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   pt10lep_3gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_3_lep_Combined", 10));
   mass_3gensel.reset(new MassCut3_gen(ctx, "GEN_XCone_3_had_Combined", "GEN_XCone_3_lep_Combined", 1.2));
   subjet_quality_3gensel.reset(new SubjetQuality_gen(ctx, "GEN_XCone_3_had_Combined", 30, 2.5));
+  no_near_jet_3gensel.reset(new NoNearJet_gen(ctx, "GEN_XCone_3_had_Combined", 1.2));
 
   // Initiate input and output
   if(debug) cout << "\t--- Initiate input and output" << endl;
@@ -148,8 +150,9 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   bool pass_measurement2_gen = false;
   bool pass_measurement3_gen = false;
 
+  //pass_measurement_gen = passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && lepton_sel_gen->passes(event);
   pass_measurement2_gen = passed_gensel && pt400_2gensel->passes(event) && pt10lep_2gensel->passes(event) && mass_2gensel->passes(event) && subjet_quality_2gensel->passes(event) && lepton_sel_gen->passes(event);
-  pass_measurement3_gen = passed_gensel && pt400_3gensel->passes(event) && pt10lep_3gensel->passes(event) && mass_3gensel->passes(event) && subjet_quality_3gensel->passes(event) && lepton_sel_gen->passes(event);
+  pass_measurement3_gen = passed_gensel && pt400_3gensel->passes(event) && pt10lep_3gensel->passes(event) && mass_3gensel->passes(event) && subjet_quality_3gensel->passes(event) && lepton_sel_gen->passes(event) && no_near_jet_3gensel->passes(event);
 
   // fill Hists
   if(pass_measurement2_gen) h_GEN_XCone2->fill(event);
