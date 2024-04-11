@@ -124,6 +124,9 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   init_handels(ctx);
   init_MC_hists(ctx);
 
+  ctx.undeclare_all_event_output(); // Delete everything to save space
+  declare_output(ctx); // Declare new output
+
 }
 
 bool MTopJetPostSelection::process(uhh2::Event& event){
