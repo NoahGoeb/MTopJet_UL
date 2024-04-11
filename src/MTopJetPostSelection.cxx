@@ -37,6 +37,8 @@ protected:
 
   Event::Handle<bool> h_passed_gensel;
 
+  Event::Handle<bool> h_measure_gen;
+
   //Selections
   unique_ptr<uhh2::Selection> pt400_2gensel;
   unique_ptr<uhh2::Selection> pt10lep_2gensel;
@@ -93,6 +95,8 @@ void MTopJetPostSelection::init_handels(uhh2::Context& ctx){
 }
 
 void MTopJetPostSelection::declare_output(uhh2::Context& ctx){
+
+  h_measure_gen = ctx.declare_event_output<bool>("passed_measurement_gen");
 
 }
 
@@ -234,6 +238,8 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   if(pass_measurement3_gen_pt800) h_GEN_XCone3_pt800->fill(event);
   if(pass_measurement2_gen_pt900) h_GEN_XCone2_pt900->fill(event);
   if(pass_measurement3_gen_pt900) h_GEN_XCone3_pt900->fill(event);
+
+  event.set(h_measure_gen, pass_measurement2_gen || pass_measurement3_gen);
 
   return true;
 }
