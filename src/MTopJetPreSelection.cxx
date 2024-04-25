@@ -51,7 +51,9 @@ protected:
 
   // selections
   std::unique_ptr<uhh2::AnalysisModule> remove_lepton_rec;
-  std::unique_ptr<uhh2::AnalysisModule> remove_lepton_gen;
+  std::unique_ptr<uhh2::AnalysisModule> remove_lepton_gen2;
+  std::unique_ptr<uhh2::AnalysisModule> remove_lepton_gen3;
+  std::unique_ptr<uhh2::AnalysisModule> remove_lepton_genSubPT;
 
   std::unique_ptr<uhh2::Selection> lumi_sel;
   std::unique_ptr<uhh2::Selection> genmttbar_sel;
@@ -77,15 +79,18 @@ protected:
 
   // handles for output
   Event::Handle<bool>h_recsel;
-  Event::Handle<bool>h_gensel;
+  Event::Handle<bool>h_gensel2;
+  Event::Handle<bool>h_gensel3;
+  Event::Handle<bool>h_genselSubPT;
   Event::Handle<std::vector<TopJet>>h_fatjets;
-  Event::Handle<std::vector<GenTopJet>>h_genfatjets;
+  Event::Handle<std::vector<GenTopJet>>h_genfatjets2;
+  Event::Handle<std::vector<GenTopJet>>h_genfatjets3;
+  Event::Handle<std::vector<GenTopJet>>h_genfatjetsSubPT;
 
   //write output
   std::unique_ptr<uhh2::AnalysisModule> output;
 
   Year year;
-  uint nJets;
 
   // bools
   bool isMC;
@@ -111,7 +116,6 @@ protected:
 MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
 
   debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
-  nJets = atoi(ctx.get("nJets","2").c_str()); // look for nJets, expect 2 if not found
 
   //// YEARSWITCHER
   year = extract_year(ctx); // Ask for the year of Event
@@ -157,14 +161,15 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   if(debug) cout << "Output and Handles" << endl;
 
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
-  h_gensel = ctx.declare_event_output<bool>("passed_gensel");
+  h_gensel2 = ctx.declare_event_output<bool>("passed_gensel2");
+  h_gensel3 = ctx.declare_event_output<bool>("passed_gensel3");
+  h_genselSubPT = ctx.declare_event_output<bool>("passed_gensel2SubPT");
 
   h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
-  h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
-  if(nJets == 3) {
-    //unfortunate naming, but genXCone3TopJets has 3 clusterd fatjets, while genXCone33TopJets has 2 fatjets
-    h_genfatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone3TopJets");
-  }
+  h_genfatjets2=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
+  //unfortunate naming, but genXCone3TopJets has 3 clusterd fatjets, while genXCone33TopJets has 2 fatjets
+  h_genfatjets3=ctx.get_handle<std::vector<GenTopJet>>("genXCone3TopJets");
+  h_genfatjetsSubPT=ctx.get_handle<std::vector<GenTopJet>>("genXCone2TopJetsPTSubjet");
 
   //// COMMON MODULES
   if(debug) cout << "Common Modules" << endl;
@@ -250,8 +255,9 @@ MTopJetPreSelection::MTopJetPreSelection(uhh2::Context& ctx){
   //// PRODUCER
   remove_lepton_rec.reset(new RemoveLepton(ctx, "xconeCHS"));
   if(isMC) {
-    if(nJets == 2) remove_lepton_gen.reset(new RemoveLeptonGen(ctx, "genXCone33TopJets"));
-    else if(nJets == 3) remove_lepton_gen.reset(new RemoveLeptonGen(ctx, "genXCone3TopJets"));
+    remove_lepton_gen2.reset(new RemoveLeptonGen(ctx, "genXCone33TopJets"));
+    remove_lepton_gen3.reset(new RemoveLeptonGen(ctx, "genXCone3TopJets"));
+    remove_lepton_genSubPT.reset(new RemoveLeptonGen(ctx, "genXCone2TopJetsPTSubjet"));
   }
   output.reset(new WriteOutput(ctx));
 
@@ -271,12 +277,21 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   // get Rec and Gen jets
   std::vector<TopJet> jets = event.get(h_fatjets);
-  std::vector<GenTopJet> genJets = event.get(h_genfatjets);
+  std::vector<GenTopJet> genJets2 = event.get(h_genfatjets2);
+  std::vector<GenTopJet> genJets3 = event.get(h_genfatjets3);
+  std::vector<GenTopJet> genJetsSubPT = event.get(h_genfatjetsSubPT);
 
   // check number of jets
-  if(jets.size() < nJets) return false;
+
+  bool pass_genjets2 = true;
+  bool pass_genjets3 = true;
+  bool pass_genjetsSubPT = true;
+
+  if(jets.size() < 2) return false;
   if(!event.isRealData){
-    if(genJets.size() < nJets) return false;
+    if(genJets2.size() < 2) pass_genjets2 =  false;
+    if(genJets3.size() < 3) pass_genjets3 =  false;
+    if(genJetsSubPT.size() < 2) pass_genjetsSubPT =  false;
   }
 
   if(debug) cout << "luminosity sections" << endl;
@@ -441,7 +456,9 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
   else passed_recsel = false;
 
   //// EVNET SELECTION GEN
-  bool passed_gensel;
+  bool passed_gensel2;
+  bool passed_gensel3;
+  bool passed_genselSubPT;
 
   bool pass_semilep;
   if(isMC) pass_semilep = SemiLepDecay->passes(event);
@@ -458,21 +475,31 @@ bool MTopJetPreSelection::process(uhh2::Event& event){
 
   if(pass_genmuon || pass_genelec) pass_genlepton = true;
 
-  if(pass_semilep && pass_genlepton) passed_gensel = true;
-  else passed_gensel = false;
+  if(pass_semilep && pass_genlepton && pass_genjets2) passed_gensel2 = true;
+  else passed_gensel2 = false;
 
-  if(!passed_recsel && !passed_gensel) return false;
+  if(pass_semilep && pass_genlepton && pass_genjets3) passed_gensel3 = true;
+  else passed_gensel3 = false;
+
+  if(pass_semilep && pass_genlepton && pass_genjetsSubPT) passed_genselSubPT = true;
+  else passed_genselSubPT = false;
+
+  if(!passed_recsel && !passed_gensel2 && !passed_gensel3 && !passed_genselSubPT) return false;
 
   //// PRODUCER
   remove_lepton_rec->process(event);
   if(isTTbar){
-    remove_lepton_gen->process(event);
+    remove_lepton_gen2->process(event);
+    remove_lepton_gen3->process(event);
+    remove_lepton_genSubPT->process(event);
   }
 
   output->process(event);
 
   event.set(h_recsel, passed_recsel);
-  event.set(h_gensel, passed_gensel);
+  event.set(h_gensel2, passed_gensel2);
+  event.set(h_gensel3, passed_gensel3);
+  event.set(h_genselSubPT, passed_genselSubPT);
 
   return true;
 
