@@ -100,6 +100,18 @@ namespace uhh2 {
     uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
     float dR;
   };
+
+  class TopMatched_gen : public Selection {
+
+  public:
+    explicit TopMatched_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float dR;
+  };
   
   
 }

@@ -148,7 +148,34 @@ bool uhh2::NoNearJet_gen::passes(const uhh2::Event& event){
   bool pass = true;
   std::vector<GenTopJet> jets = event.get(h_jets);
   if(jets.size() > 1) {
-    if(deltaR(jets.at(0), jets.at(1)) < dR) pass = false;
+    if(deltaR(jets.at(0), jets.at(1)) < dR) {
+      pass = false;
+    }
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////
+
+uhh2::TopMatched_gen::TopMatched_gen(uhh2::Context& ctx, const std::string & name, float dR_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+dR(dR_){}
+
+bool uhh2::TopMatched_gen::passes(const uhh2::Event& event){
+  bool pass = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  const auto & ttbargen = event.get(h_ttbargen);
+  GenParticle top;
+  if(ttbargen.IsTopHadronicDecay()) {
+    top = ttbargen.Top();
+  } else if(ttbargen.IsAntiTopHadronicDecay()) {
+    top = ttbargen.Antitop();
+  }
+  if(jets.size() > 0) {
+    if(deltaR(jets.at(0), top) < dR) {
+      pass = true;
+    }
   }
   return pass;
 }
