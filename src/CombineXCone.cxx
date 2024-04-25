@@ -184,3 +184,87 @@ bool CombineXCone3_gen::process(uhh2::Event & event){
   // delete combine;
   return true;
 }
+
+CombineXConeSubPT_gen::CombineXConeSubPT_gen(uhh2::Context & ctx, bool isTTbar, const std::string & name_had, const std::string & name_lep):
+h_GENxcone2hadjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_had)),
+h_GENxcone2lepjets(ctx.declare_event_output<std::vector<GenTopJet>>(name_lep)),
+h_GENfatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone2TopJetsPTSubjet")),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+isTTbar_ (isTTbar) {}
+
+bool CombineXConeSubPT_gen::process(uhh2::Event & event){
+  //---------------------------------------------------------------------------------------
+  //--------------------------------- get subjets and lepton ------------------------------
+  //---------------------------------------------------------------------------------------
+  GenParticle lepton;
+  std::vector<GenTopJet> jets = event.get(h_GENfatjets);
+  if(jets.size() < 2) return false;
+  CombineXCone* combine = new CombineXCone();
+  //---------------------------------------------------------------------------------------
+  //------------- define had and lep jet (deltaR) -----------------------------------------
+  //---------------------------------------------------------------------------------------
+  GenTopJet fathadjet, fatlepjet;
+  if(isTTbar_) {
+    TTbarGen ttbargen = event.get(h_ttbargen);
+    if(ttbargen.IsSemiLeptonicDecay()){
+      lepton = ttbargen.ChargedLepton();
+      float dR1 = deltaR(lepton, jets.at(0));
+      float dR2 = deltaR(lepton, jets.at(1));
+      if(dR1 < dR2){
+        fatlepjet = jets.at(0);
+        fathadjet = jets.at(1);
+      }
+      else{
+        fatlepjet = jets.at(1);
+        fathadjet = jets.at(0);
+      }
+    }
+    else{
+      fatlepjet = jets.at(1);
+      fathadjet = jets.at(0);
+    }
+  }
+  else{
+    fatlepjet = jets.at(1);
+    fathadjet = jets.at(0);
+  }
+  //---------------------------------------------------------------------------------------
+  //-------- set Lorentz Vectors of subjets and combine them ------------------------------
+  //---------------------------------------------------------------------------------------
+  std::vector<GenJet> subjets_lep = fatlepjet.subjets();
+  std::vector<GenJet> subjets_had = fathadjet.subjets();
+  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0, 2.5);
+  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0, 2.5);
+  //-------- set subjettines variables ----------------------------------------------------
+  lepjet.set_tau1(fatlepjet.tau1());
+  lepjet.set_tau2(fatlepjet.tau2());
+  lepjet.set_tau3(fatlepjet.tau3());
+  lepjet.set_tau4(fatlepjet.tau4());
+  lepjet.set_tau1_groomed(fatlepjet.tau1_groomed());
+  lepjet.set_tau2_groomed(fatlepjet.tau2_groomed());
+  lepjet.set_tau3_groomed(fatlepjet.tau3_groomed());
+  lepjet.set_tau4_groomed(fatlepjet.tau4_groomed());
+
+  hadjet.set_tau1(fathadjet.tau1());
+  hadjet.set_tau2(fathadjet.tau2());
+  hadjet.set_tau3(fathadjet.tau3());
+  hadjet.set_tau4(fathadjet.tau4());
+  hadjet.set_tau1_groomed(fathadjet.tau1_groomed());
+  hadjet.set_tau2_groomed(fathadjet.tau2_groomed());
+  hadjet.set_tau3_groomed(fathadjet.tau3_groomed());
+  hadjet.set_tau4_groomed(fathadjet.tau4_groomed());
+
+  vector<GenTopJet> hadjets;
+  vector<GenTopJet> lepjets;
+  hadjets.push_back(hadjet);
+  lepjets.push_back(lepjet);
+
+  //---------------------------------------------------------------------------------------
+  //--------------------------------- Write Jets ------------------------------------------
+  //---------------------------------------------------------------------------------------
+  event.set(h_GENxcone2hadjets, hadjets);
+  event.set(h_GENxcone2lepjets, lepjets);
+
+  // delete combine;
+  return true;
+}

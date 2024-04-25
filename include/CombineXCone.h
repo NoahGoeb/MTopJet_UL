@@ -57,3 +57,19 @@ private:
   bool isTTbar_;
 
 };
+
+class CombineXConeSubPT_gen: public uhh2::AnalysisModule{
+public:
+
+  explicit CombineXConeSubPT_gen(uhh2::Context &, bool, const std::string &, const std::string &);
+  virtual bool process(uhh2::Event & ) override;
+
+private:
+
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone2hadjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone2lepjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
+  uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  bool isTTbar_;
+
+};
