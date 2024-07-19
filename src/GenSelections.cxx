@@ -66,6 +66,52 @@ bool uhh2::LeadingJetPT_gen::passes(const uhh2::Event& event){
 
 ////////////////////////////////////////////////////////
 
+uhh2::LeadingJetPTRange_gen::LeadingJetPTRange_gen(uhh2::Context& ctx, const std::string & name, float ptmin, float ptmax):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+ptmin_(ptmin),
+ptmax_(ptmax) {}
+
+bool uhh2::LeadingJetPTRange_gen::passes(const uhh2::Event& event){
+  bool pass_jetptrange = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  GenTopJet jet1;
+  if(jets.size()>0){
+    jet1 = jets.at(0);
+    float pt = jet1.pt();
+    if(pt >= ptmin_ && pt < ptmax_) pass_jetptrange = true;
+  }
+  return pass_jetptrange;
+}
+
+////////////////////////////////////////////////////////
+
+uhh2::JetPTCombined_gen::JetPTCombined_gen(uhh2::Context& ctx, const std::string & name, float pt):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+pt_(pt){}
+
+bool uhh2::JetPTCombined_gen::passes(const uhh2::Event& event){
+  bool pass_jetptrange = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  TLorentzVector jet1_v4, jet2_v4, jet_v4_combined;
+  GenTopJet jet1;
+  float ptJet;
+  if(jets.size()>1 && deltaR(jets.at(0), jets.at(1))<1.2) {
+    jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
+    jet2_v4.SetPxPyPzE(jets.at(1).v4().Px(), jets.at(1).v4().Py(), jets.at(1).v4().Pz(), jets.at(1).v4().E());
+
+    jet_v4_combined = jet1_v4 + jet2_v4;
+    
+    if(jet_v4_combined.Pt() > pt_) pass_jetptrange = true;
+  } else {
+    jet1 = jets.at(0);
+    ptJet = jet1.pt();
+    if(ptJet >= pt_) pass_jetptrange = true;
+  }
+  return pass_jetptrange;
+}
+
+////////////////////////////////////////////////////////
+
 uhh2::MassCut2_gen::MassCut2_gen(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
 h_hadjets(ctx.get_handle<std::vector<GenTopJet>>(hadname)),
 h_lepjets(ctx.get_handle<std::vector<GenTopJet>>(lepname)),

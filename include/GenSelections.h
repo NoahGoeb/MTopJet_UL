@@ -56,6 +56,29 @@ namespace uhh2 {
     float ptcut_;
   };
 
+  class LeadingJetPTRange_gen : public Selection {
+
+  public:
+    explicit LeadingJetPTRange_gen(Context&, const std::string &, float, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float ptmin_;
+    float ptmax_;
+  };
+
+  class JetPTCombined_gen : public Selection {
+
+  public:
+    explicit JetPTCombined_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float pt_;
+  };
+
   class MassCut2_gen : public Selection {
 
   public:
