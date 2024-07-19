@@ -29,6 +29,21 @@ protected:
 
     TH1F *GenJetTau2Tau1, *GenJetTau3Tau2, *GenJetTau3Tau1, *GenJetTau4Tau3, *GenJetTau4Tau2, *GenJetTau4Tau1;
 
+    TH1F *GenJetGroomedTau1, *GenJetGroomedTau2, *GenJetGroomedTau3, *GenJetGroomedTau4;
+
+    TH1F *GenJetGroomedTau2Tau1, *GenJetGroomedTau3Tau2, *GenJetGroomedTau3Tau1, *GenJetGroomedTau4Tau3, *GenJetGroomedTau4Tau2, *GenJetGroomedTau4Tau1;
+
+    TH1F *GenDeltaRJets12;
+
+    TH1F *GenJetMassTop, *GenJetMassGluon;
+
+    TH1F *GenJetMassTau32Cut, *GenJetMassTau42Cut;
+
+    TH1F *GenJetMassGroomedTau32Cut, *GenJetMassGroomedTau42Cut;
+
+    TH1F *GenJetMassCombined;
+
+    uhh2::Event::Handle<TTbarGen>h_ttbargen;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_jets;
 
     bool debug;

@@ -57,14 +57,20 @@ protected:
   unique_ptr<uhh2::Selection> subjet_quality_3gensel;
   unique_ptr<uhh2::Selection> no_near_jet_3gensel;
   unique_ptr<uhh2::Selection> top_3genmatch;
-  unique_ptr<uhh2::Selection> gluon_3genmatch;
+  unique_ptr<uhh2::Selection> tauCut32_3gen;
+  unique_ptr<uhh2::Selection> tauCut42_3gen;
+  unique_ptr<uhh2::Selection> tauCut42_2gen;
+  unique_ptr<uhh2::Selection> groomedTauCut32_3gen;
+  unique_ptr<uhh2::Selection> groomedTauCut42_3gen;
+  unique_ptr<uhh2::Selection> pt400Combined_3gen;
+  unique_ptr<uhh2::Selection> fullyMergedLeading_gen;
+  unique_ptr<uhh2::Selection> fullyMergedSubleading_gen;
 
   unique_ptr<uhh2::Selection> pt400_SubPTgensel;
   unique_ptr<uhh2::Selection> pt10lep_SubPTgensel;
   unique_ptr<uhh2::Selection> mass_SubPTgensel;
   unique_ptr<uhh2::Selection> subjet_quality_SubPTgensel;
   unique_ptr<uhh2::Selection> top_SubPTgenmatch;
-  unique_ptr<uhh2::Selection> gluon_SubPTgenmatch;
 
 
   unique_ptr<uhh2::Selection> pt500_2gensel;
@@ -87,10 +93,23 @@ protected:
   unique_ptr<Hists> h_GEN_XCone2;
   unique_ptr<Hists> h_GEN_XCone2_TopMatched;
   unique_ptr<Hists> h_GEN_XCone2_GluonMatched;
+  unique_ptr<Hists> h_GEN_XCone2_GluonPartMatched;
+  unique_ptr<Hists> h_GEN_XCone2_NotTauCut42;
 
   unique_ptr<Hists> h_GEN_XCone3;
   unique_ptr<Hists> h_GEN_XCone3_TopMatched;
   unique_ptr<Hists> h_GEN_XCone3_GluonMatched;
+  unique_ptr<Hists> h_GEN_XCone3_TauCut32;
+  unique_ptr<Hists> h_GEN_XCone3_TauCut42;
+  unique_ptr<Hists> h_GEN_XCone3_NotTauCut32;
+  unique_ptr<Hists> h_GEN_XCone3_NotTauCut42;
+  unique_ptr<Hists> h_GEN_XCone3_FullyMergedLeading;
+  unique_ptr<Hists> h_GEN_XCone3_FullyMergedSubleading;
+  unique_ptr<Hists> h_GEN_XCone3_NoCutsFullyMergedLeading;
+  unique_ptr<Hists> h_GEN_XCone3_NoCutsFullyMergedSubleading;
+
+  unique_ptr<Hists> h_GEN_XCone3_Near;
+  unique_ptr<Hists> h_GEN_XCone3_All;
 
   unique_ptr<Hists> h_GEN_XConeSubPT;
   unique_ptr<Hists> h_GEN_XConeSubPT_TopMatched;
@@ -102,6 +121,8 @@ protected:
   unique_ptr<Hists> h_GEN_XCone3_pt500;
   unique_ptr<Hists> h_GEN_XCone3_pt500_TopMatched;
   unique_ptr<Hists> h_GEN_XCone3_pt500_GluonMatched;
+  unique_ptr<Hists> h_GEN_XCone3_pt500_TauCut32;
+  unique_ptr<Hists> h_GEN_XCone3_pt500_TauCut42;
   unique_ptr<Hists> h_GEN_XConeSubPT_pt500;
 
   unique_ptr<Hists> h_GEN_XCone2_pt600;
@@ -110,6 +131,8 @@ protected:
   unique_ptr<Hists> h_GEN_XCone3_pt600;
   unique_ptr<Hists> h_GEN_XCone3_pt600_TopMatched;
   unique_ptr<Hists> h_GEN_XCone3_pt600_GluonMatched;
+  unique_ptr<Hists> h_GEN_XCone3_pt600_TauCut32;
+  unique_ptr<Hists> h_GEN_XCone3_pt600_TauCut42;
   unique_ptr<Hists> h_GEN_XConeSubPT_pt600;
 
   unique_ptr<Hists> h_GEN_XCone2_pt700;
@@ -118,6 +141,8 @@ protected:
   unique_ptr<Hists> h_GEN_XCone3_pt700;
   unique_ptr<Hists> h_GEN_XCone3_pt700_TopMatched;
   unique_ptr<Hists> h_GEN_XCone3_pt700_GluonMatched;
+  unique_ptr<Hists> h_GEN_XCone3_pt700_TauCut32;
+  unique_ptr<Hists> h_GEN_XCone3_pt700_TauCut42;
   unique_ptr<Hists> h_GEN_XConeSubPT_pt700;
 
   unique_ptr<Hists> h_GEN_XCone2_pt800;
@@ -126,6 +151,8 @@ protected:
   unique_ptr<Hists> h_GEN_XCone3_pt800;
   unique_ptr<Hists> h_GEN_XCone3_pt800_TopMatched;
   unique_ptr<Hists> h_GEN_XCone3_pt800_GluonMatched;
+  unique_ptr<Hists> h_GEN_XCone3_pt800_TauCut32;
+  unique_ptr<Hists> h_GEN_XCone3_pt800_TauCut42;
   unique_ptr<Hists> h_GEN_XConeSubPT_pt800;
 
   unique_ptr<Hists> h_GEN_XCone2_pt900;
@@ -134,6 +161,8 @@ protected:
   unique_ptr<Hists> h_GEN_XCone3_pt900;
   unique_ptr<Hists> h_GEN_XCone3_pt900_TopMatched;
   unique_ptr<Hists> h_GEN_XCone3_pt900_GluonMatched;
+  unique_ptr<Hists> h_GEN_XCone3_pt900_TauCut32;
+  unique_ptr<Hists> h_GEN_XCone3_pt900_TauCut42;
   unique_ptr<Hists> h_GEN_XConeSubPT_pt900;
 
   unique_ptr<Hists> h_GEN_XCone2_sel;
@@ -155,8 +184,8 @@ void MTopJetPostSelection::init_handels(uhh2::Context& ctx){
 
   if(debug) cout << "--- Start Module - init handles ---" << endl;
 
-  h_passed_gensel2 = ctx.get_handle<bool>("passed_gensel22");
-  h_passed_gensel3 = ctx.get_handle<bool>("passed_gensel23");
+  h_passed_gensel2 = ctx.get_handle<bool>("passed_gensel2");
+  h_passed_gensel3 = ctx.get_handle<bool>("passed_gensel3");
   h_passed_genselSubPT = ctx.get_handle<bool>("passed_gensel2SubPT");
 
 }
@@ -172,10 +201,23 @@ void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
   h_GEN_XCone2.reset(new GenHists(ctx, "gen_XCone_2", "GEN_XCone_2_had_Combined"));
   h_GEN_XCone2_TopMatched.reset(new GenHists(ctx, "gen_XCone_2_TopMatched", "GEN_XCone_2_had_Combined"));
   h_GEN_XCone2_GluonMatched.reset(new GenHists(ctx, "gen_XCone_2_GluonMatched", "GEN_XCone_2_had_Combined"));
+  h_GEN_XCone2_GluonPartMatched.reset(new GenHists(ctx, "gen_XCone_2_GluonPartMatched", "GEN_XCone_2_had_Combined"));
+  h_GEN_XCone2_NotTauCut42.reset(new GenHists(ctx, "gen_XCone_2_NotTauCut42", "GEN_XCone_2_had_Combined"));
 
   h_GEN_XCone3.reset(new GenHists(ctx, "gen_XCone_3", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_TopMatched.reset(new GenHists(ctx, "gen_XCone_3_TopMatched", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_GluonMatched.reset(new GenHists(ctx, "gen_XCone_3_GluonMatched", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_TauCut32.reset(new GenHists(ctx, "gen_XCone_3_TauCut32", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_TauCut42.reset(new GenHists(ctx, "gen_XCone_3_TauCut42", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_NotTauCut32.reset(new GenHists(ctx, "gen_XCone_3_NotTauCut32", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_NotTauCut42.reset(new GenHists(ctx, "gen_XCone_3_NotTauCut42", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_FullyMergedLeading.reset(new GenHists(ctx, "gen_XCone_3_FullyMergedLeading", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_FullyMergedSubleading.reset(new GenHists(ctx, "gen_XCone_3_FullyMergedSubleading", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_NoCutsFullyMergedLeading.reset(new GenHists(ctx, "gen_XCone_3_NoCutsFullyMergedLeading", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_NoCutsFullyMergedSubleading.reset(new GenHists(ctx, "gen_XCone_3_NoCutsFullyMergedSubleading", "GEN_XCone_3_had_Combined"));
+
+  h_GEN_XCone3_Near.reset(new GenHists(ctx, "gen_XCone_3_Near", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_All.reset(new GenHists(ctx, "gen_XCone_3_All", "GEN_XCone_3_had_Combined"));
 
   h_GEN_XConeSubPT.reset(new GenHists(ctx, "gen_XCone_SubPT", "GEN_XCone_SubPT_had_Combined"));
   h_GEN_XConeSubPT_TopMatched.reset(new GenHists(ctx, "gen_XCone_SubPT_TopMatched", "GEN_XCone_SubPT_had_Combined"));
@@ -187,6 +229,8 @@ void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
   h_GEN_XCone3_pt500.reset(new GenHists(ctx, "gen_XCone_3_pt500", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt500_TopMatched.reset(new GenHists(ctx, "gen_XCone_3_pt500_TopMatched", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt500_GluonMatched.reset(new GenHists(ctx, "gen_XCone_3_pt500_GluonMatched", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt500_TauCut32.reset(new GenHists(ctx, "gen_XCone_3_pt500_TauCut32", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt500_TauCut42.reset(new GenHists(ctx, "gen_XCone_3_pt500_TauCut42", "GEN_XCone_3_had_Combined"));
   h_GEN_XConeSubPT_pt500.reset(new GenHists(ctx, "gen_XCone_SubPT_pt500", "GEN_XCone_SubPT_had_Combined"));
 
   h_GEN_XCone2_pt600.reset(new GenHists(ctx, "gen_XCone_2_pt600", "GEN_XCone_2_had_Combined"));
@@ -195,6 +239,8 @@ void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
   h_GEN_XCone3_pt600.reset(new GenHists(ctx, "gen_XCone_3_pt600", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt600_TopMatched.reset(new GenHists(ctx, "gen_XCone_3_pt600_TopMatched", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt600_GluonMatched.reset(new GenHists(ctx, "gen_XCone_3_pt600_GluonMatched", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt600_TauCut32.reset(new GenHists(ctx, "gen_XCone_3_pt600_TauCut32", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt600_TauCut42.reset(new GenHists(ctx, "gen_XCone_3_pt600_TauCut42", "GEN_XCone_3_had_Combined"));
   h_GEN_XConeSubPT_pt600.reset(new GenHists(ctx, "gen_XCone_SubPT_pt600", "GEN_XCone_SubPT_had_Combined"));
 
   h_GEN_XCone2_pt700.reset(new GenHists(ctx, "gen_XCone_2_pt700", "GEN_XCone_2_had_Combined"));
@@ -203,6 +249,8 @@ void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
   h_GEN_XCone3_pt700.reset(new GenHists(ctx, "gen_XCone_3_pt700", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt700_TopMatched.reset(new GenHists(ctx, "gen_XCone_3_pt700_TopMatched", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt700_GluonMatched.reset(new GenHists(ctx, "gen_XCone_3_pt700_GluonMatched", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt700_TauCut32.reset(new GenHists(ctx, "gen_XCone_3_pt700_TauCut32", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt700_TauCut42.reset(new GenHists(ctx, "gen_XCone_3_pt700_TauCut42", "GEN_XCone_3_had_Combined"));
   h_GEN_XConeSubPT_pt700.reset(new GenHists(ctx, "gen_XCone_SubPT_pt700", "GEN_XCone_SubPT_had_Combined"));
 
   h_GEN_XCone2_pt800.reset(new GenHists(ctx, "gen_XCone_2_pt800", "GEN_XCone_2_had_Combined"));
@@ -211,6 +259,8 @@ void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
   h_GEN_XCone3_pt800.reset(new GenHists(ctx, "gen_XCone_3_pt800", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt800_TopMatched.reset(new GenHists(ctx, "gen_XCone_3_pt800_TopMatched", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt800_GluonMatched.reset(new GenHists(ctx, "gen_XCone_3_pt800_GluonMatched", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt800_TauCut32.reset(new GenHists(ctx, "gen_XCone_3_pt800_TauCut32", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt800_TauCut42.reset(new GenHists(ctx, "gen_XCone_3_pt800_TauCut42", "GEN_XCone_3_had_Combined"));
   h_GEN_XConeSubPT_pt800.reset(new GenHists(ctx, "gen_XCone_SubPT_pt800", "GEN_XCone_SubPT_had_Combined"));
 
   h_GEN_XCone2_pt900.reset(new GenHists(ctx, "gen_XCone_2_pt900", "GEN_XCone_2_had_Combined"));
@@ -219,6 +269,8 @@ void MTopJetPostSelection::init_MC_hists(uhh2::Context& ctx){
   h_GEN_XCone3_pt900.reset(new GenHists(ctx, "gen_XCone_3_pt900", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt900_TopMatched.reset(new GenHists(ctx, "gen_XCone_3_pt900_TopMatched", "GEN_XCone_3_had_Combined"));
   h_GEN_XCone3_pt900_GluonMatched.reset(new GenHists(ctx, "gen_XCone_3_pt900_GluonMatched", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt900_TauCut32.reset(new GenHists(ctx, "gen_XCone_3_pt900_TauCut32", "GEN_XCone_3_had_Combined"));
+  h_GEN_XCone3_pt900_TauCut42.reset(new GenHists(ctx, "gen_XCone_3_pt900_TauCut42", "GEN_XCone_3_had_Combined"));
   h_GEN_XConeSubPT_pt900.reset(new GenHists(ctx, "gen_XCone_SubPT_pt900", "GEN_XCone_SubPT_had_Combined"));
 
   h_GEN_XCone2_sel.reset(new GenHists(ctx, "gen_XCone_2_sel", "GEN_XCone_2_had_Combined"));
@@ -273,14 +325,20 @@ MTopJetPostSelection::MTopJetPostSelection(uhh2::Context& ctx){
   subjet_quality_3gensel.reset(new SubjetQuality_gen(ctx, "GEN_XCone_3_had_Combined", 30, 2.5));
   no_near_jet_3gensel.reset(new NoNearJet_gen(ctx, "GEN_XCone_3_had_Combined", 1.2));
   top_3genmatch.reset(new TopMatched_gen(ctx, "GEN_XCone_3_had_Combined", 1.2));
-  gluon_3genmatch.reset(new GluonMatched_gen(ctx, "GEN_XCone_3_had_Combined", 1.2));
+  tauCut32_3gen.reset(new Tau32Cut_gen(ctx, "GEN_XCone_3_had_Combined", 0.58));
+  tauCut42_3gen.reset(new Tau42Cut_gen(ctx, "GEN_XCone_3_had_Combined", 0.46));
+  tauCut42_2gen.reset(new Tau42Cut_gen(ctx, "GEN_XCone_2_had_Combined", 0.46));
+  groomedTauCut32_3gen.reset(new GroomedTau32Cut_gen(ctx, "GEN_XCone_3_had_Combined", 0.58));
+  groomedTauCut42_3gen.reset(new GroomedTau42Cut_gen(ctx, "GEN_XCone_3_had_Combined", 0.46));
+  pt400Combined_3gen.reset(new JetPTCombined_gen(ctx, "GEN_XCone_3_had_Combined", 400));
+  fullyMergedLeading_gen.reset(new FullyMerged_Matched(ctx, "GEN_XCone_3_had_Combined", 0));
+  fullyMergedSubleading_gen.reset(new FullyMerged_Matched(ctx, "GEN_XCone_3_had_Combined", 1));
 
   pt400_SubPTgensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_SubPT_had_Combined", 400));
   pt10lep_SubPTgensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_SubPT_lep_Combined", 10));
   mass_SubPTgensel.reset(new MassCut2_gen(ctx, "GEN_XCone_SubPT_had_Combined", "GEN_XCone_SubPT_lep_Combined"));
   subjet_quality_SubPTgensel.reset(new SubjetQuality_gen(ctx, "GEN_XCone_SubPT_had_Combined", 30, 2.5));
   top_SubPTgenmatch.reset(new TopMatched_gen(ctx, "GEN_XCone_SubPT_had_Combined", 1.2));
-  gluon_SubPTgenmatch.reset(new GluonMatched_gen(ctx, "GEN_XCone_SubPT_had_Combined", 1.2));
 
   pt500_2gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_2_had_Combined", 500));
   pt500_3gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone_3_had_Combined", 500));
@@ -331,6 +389,9 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   bool pass_measurement3_gen = false;
   bool pass_measurementSubPT_gen = false;
 
+  bool pass_measurement3_gen_near = false;
+  bool pass_measurement3_gen_all = false;
+
   bool pass_measurement2_gen_pt500 = false;
   bool pass_measurement3_gen_pt500 = false;
   bool pass_measurementSubPT_gen_pt500 = false;
@@ -349,8 +410,11 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
 
   //pass_measurement_gen = passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && lepton_gensel->passes(event);
   pass_measurement2_gen = passed_gensel2 && pt400_2gensel->passes(event) && pt10lep_2gensel->passes(event) && mass_2gensel->passes(event) && subjet_quality_2gensel->passes(event) && lepton_gensel->passes(event);
-  pass_measurement3_gen = passed_gensel3 && pt400_3gensel->passes(event) && pt10lep_3gensel->passes(event) && mass_3gensel->passes(event) && subjet_quality_3gensel->passes(event) && lepton_gensel->passes(event) && no_near_jet_3gensel->passes(event);
+  pass_measurement3_gen = passed_gensel3 && pt400Combined_3gen->passes(event) && pt10lep_3gensel->passes(event) && mass_3gensel->passes(event) && subjet_quality_3gensel->passes(event) && lepton_gensel->passes(event) && no_near_jet_3gensel->passes(event);
   pass_measurementSubPT_gen = passed_genselSubPT && pt400_SubPTgensel->passes(event) && pt10lep_SubPTgensel->passes(event) && mass_SubPTgensel->passes(event) && subjet_quality_SubPTgensel->passes(event) && lepton_gensel->passes(event);
+
+  pass_measurement3_gen_near = passed_gensel3 && pt400Combined_3gen->passes(event) && pt10lep_3gensel->passes(event) && mass_3gensel->passes(event) && subjet_quality_3gensel->passes(event) && lepton_gensel->passes(event) && !no_near_jet_3gensel->passes(event);
+  pass_measurement3_gen_all = passed_gensel3 && pt400Combined_3gen->passes(event) && pt10lep_3gensel->passes(event) && mass_3gensel->passes(event) && subjet_quality_3gensel->passes(event) && lepton_gensel->passes(event);
 
   pass_measurement2_gen_pt500 = pass_measurement2_gen && pt500_2gensel->passes(event);
   pass_measurement2_gen_pt600 = pass_measurement2_gen && pt600_2gensel->passes(event);
@@ -371,17 +435,47 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
   pass_measurementSubPT_gen_pt900 = pass_measurementSubPT_gen && pt900_SubPTgensel->passes(event);
 
   // fill Hists
-  if(pass_measurement2_gen) h_GEN_XCone2->fill(event);
-  if(pass_measurement2_gen && top_2genmatch->passes(event)) h_GEN_XCone2_TopMatched->fill(event);
-  if(pass_measurement2_gen && !top_2genmatch->passes(event)) h_GEN_XCone2_GluonMatched->fill(event);
+  if(pass_measurement2_gen) {
+    h_GEN_XCone2->fill(event);
+    if(top_2genmatch->passes(event)) h_GEN_XCone2_TopMatched->fill(event);
+    else {
+      h_GEN_XCone2_GluonMatched->fill(event);
+      if(gluon_2genmatch->passes(event)) h_GEN_XCone2_GluonPartMatched->fill(event);
+    }
+    if(!tauCut42_2gen->passes(event)) h_GEN_XCone2_NotTauCut42->fill(event);
+  }
 
-  if(pass_measurement3_gen) h_GEN_XCone3->fill(event);
-  if(pass_measurement3_gen && top_3genmatch->passes(event)) h_GEN_XCone3_TopMatched->fill(event);
-  if(pass_measurement3_gen && !top_3genmatch->passes(event)) h_GEN_XCone3_GluonMatched->fill(event);
+  if(pass_measurement3_gen) {
+    h_GEN_XCone3->fill(event);
+    if(top_3genmatch->passes(event)) h_GEN_XCone3_TopMatched->fill(event);
+    else h_GEN_XCone3_GluonMatched->fill(event);
+    if(tauCut32_3gen->passes(event)) h_GEN_XCone3_TauCut32->fill(event);
+    else h_GEN_XCone3_NotTauCut32->fill(event);
+    if(tauCut42_3gen->passes(event)) h_GEN_XCone3_TauCut42->fill(event);
+    else h_GEN_XCone3_NotTauCut42->fill(event);
 
-  if(pass_measurementSubPT_gen) h_GEN_XConeSubPT->fill(event);
-  if(pass_measurementSubPT_gen && top_SubPTgenmatch->passes(event)) h_GEN_XConeSubPT_TopMatched->fill(event);
-  if(pass_measurementSubPT_gen && !top_SubPTgenmatch->passes(event)) h_GEN_XConeSubPT_GluonMatched->fill(event);
+    if(fullyMergedLeading_gen->passes(event)) h_GEN_XCone3_FullyMergedLeading->fill(event);
+    if(fullyMergedSubleading_gen->passes(event)) h_GEN_XCone3_FullyMergedSubleading->fill(event);
+  }
+
+  if(passed_gensel3) {
+    if(fullyMergedLeading_gen->passes(event)) h_GEN_XCone3_NoCutsFullyMergedLeading->fill(event);
+    if(fullyMergedSubleading_gen->passes(event)) h_GEN_XCone3_NoCutsFullyMergedSubleading->fill(event);
+  }
+
+  if(pass_measurement3_gen_near) {
+    h_GEN_XCone3_Near->fill(event);
+  }
+
+  if(pass_measurement3_gen_all) {
+    h_GEN_XCone3_All->fill(event);
+  }
+
+  if(pass_measurementSubPT_gen) {
+    h_GEN_XConeSubPT->fill(event);
+    if(top_SubPTgenmatch->passes(event)) h_GEN_XConeSubPT_TopMatched->fill(event);
+    else h_GEN_XConeSubPT_GluonMatched->fill(event);
+  }
 
   if(pass_measurement2_gen_pt500) {
     h_GEN_XCone2_pt500->fill(event);
@@ -413,26 +507,36 @@ bool MTopJetPostSelection::process(uhh2::Event& event){
     h_GEN_XCone3_pt500->fill(event);
     if(top_3genmatch->passes(event)) h_GEN_XCone3_pt500_TopMatched->fill(event);
     else h_GEN_XCone3_pt500_GluonMatched->fill(event);
+    if(tauCut32_3gen->passes(event)) h_GEN_XCone3_pt500_TauCut32->fill(event);
+    if(tauCut42_3gen->passes(event)) h_GEN_XCone3_pt500_TauCut42->fill(event);
   }
   if(pass_measurement3_gen_pt600) {
     h_GEN_XCone3_pt600->fill(event);
     if(top_3genmatch->passes(event)) h_GEN_XCone3_pt600_TopMatched->fill(event);
     else h_GEN_XCone3_pt600_GluonMatched->fill(event);
+    if(tauCut32_3gen->passes(event)) h_GEN_XCone3_pt600_TauCut32->fill(event);
+    if(tauCut42_3gen->passes(event)) h_GEN_XCone3_pt600_TauCut42->fill(event);
   }
   if(pass_measurement3_gen_pt700) {
     h_GEN_XCone3_pt700->fill(event);
     if(top_3genmatch->passes(event)) h_GEN_XCone3_pt700_TopMatched->fill(event);
     else h_GEN_XCone3_pt700_GluonMatched->fill(event);
+    if(tauCut32_3gen->passes(event)) h_GEN_XCone3_pt700_TauCut32->fill(event);
+    if(tauCut42_3gen->passes(event)) h_GEN_XCone3_pt700_TauCut42->fill(event);
   }
   if(pass_measurement3_gen_pt800) {
     h_GEN_XCone3_pt800->fill(event);
     if(top_3genmatch->passes(event)) h_GEN_XCone3_pt800_TopMatched->fill(event);
     else h_GEN_XCone3_pt800_GluonMatched->fill(event);
+    if(tauCut32_3gen->passes(event)) h_GEN_XCone3_pt800_TauCut32->fill(event);
+    if(tauCut42_3gen->passes(event)) h_GEN_XCone3_pt800_TauCut42->fill(event);
   }
   if(pass_measurement3_gen_pt900) {
     h_GEN_XCone3_pt900->fill(event);
     if(top_3genmatch->passes(event)) h_GEN_XCone3_pt900_TopMatched->fill(event);
     else h_GEN_XCone3_pt900_GluonMatched->fill(event);
+    if(tauCut32_3gen->passes(event)) h_GEN_XCone3_pt900_TauCut32->fill(event);
+    if(tauCut42_3gen->passes(event)) h_GEN_XCone3_pt900_TauCut42->fill(event);
   }
 
   if(pass_measurementSubPT_gen_pt500) h_GEN_XConeSubPT_pt500->fill(event);
