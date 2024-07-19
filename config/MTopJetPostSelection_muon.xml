@@ -7,8 +7,8 @@
 
 <!ENTITY debug "false">
 
-<!ENTITY INdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PreSelection/UL">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PostSelection/UL">
+<!ENTITY INdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PreSelection/UL/muon">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/goebnoah/MTopJet_Run2/PostSelection/UL/muon">
 
 
 <!-- =============================================== ttbar =========================================================================== -->
@@ -63,7 +63,7 @@
   <Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/>
   <Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop" />
 
-  <Item Name="additionalBranches" Value="passed_gensel22 passed_gensel23 passed_gensel2SubPT passed_recsel weight xconeCHS genXCone33TopJets genXCone3TopJets genXCone2TopJetsPTSubjet"/>
+  <Item Name="additionalBranches" Value="passed_gensel2 passed_gensel3 passed_gensel2SubPT passed_recsel weight xconeCHS genXCone33TopJets genXCone3TopJets genXCone2TopJetsPTSubjet"/>
 
   <Item Name="METName"                 Value="slimmedMETs"/>
 
