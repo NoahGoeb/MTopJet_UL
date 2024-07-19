@@ -5,6 +5,8 @@
 
 #include <UHH2/common/include/TTbarGen.h>
 
+#include <UHH2/MTopJet_UL/include/MTopJetUtils.h>
+
 using namespace std;
 
 
@@ -112,6 +114,18 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
     float dR;
   };
+
+  class GluonMatched_gen : public Selection {
+
+  public:
+    explicit GluonMatched_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float dR;
+  };
+  
   
   
 }

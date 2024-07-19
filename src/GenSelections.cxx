@@ -1,6 +1,6 @@
 #include <UHH2/MTopJet_UL/include/GenSelections.h>
 
-
+#include "TLorentzVector.h"
 
 uhh2::TTbarSemilep::TTbarSemilep(uhh2::Context& ctx):
 h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
@@ -182,3 +182,20 @@ bool uhh2::TopMatched_gen::passes(const uhh2::Event& event){
 
 ////////////////////////////////////////////////////////
 
+uhh2::GluonMatched_gen::GluonMatched_gen(uhh2::Context& ctx, const std::string & name, float dR_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+dR(dR_){}
+
+bool uhh2::GluonMatched_gen::passes(const uhh2::Event& event){
+  bool pass = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  std::vector<GenParticle> gluons = outgoingGluons(event);
+  if(jets.size() > 0 && gluons.size() > 0) {
+    if(deltaR(jets.at(0), gluons.at(0)) < dR) {
+      pass = true;
+    }
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////

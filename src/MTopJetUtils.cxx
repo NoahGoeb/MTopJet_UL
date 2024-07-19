@@ -24,3 +24,26 @@ const Particle* leading_lepton(const uhh2::Event& event){
 
 ////
 
+std::vector<GenParticle> outgoingGluons(const uhh2::Event & event) {
+  std::vector<GenParticle> *genparticles = event.genparticles;
+  int nparts = genparticles->size();
+  
+  std::vector<GenParticle> gluons;
+  //look for outgoing gluons in jet
+  for(int i=0; i<nparts; ++i) {
+    GenParticle* p = &(genparticles->at(i));
+
+    auto mother1 = p->mother(genparticles,1);
+    auto mother2 = p->mother(genparticles,2);
+
+    if(mother1 != nullptr && mother2 != nullptr) {
+      if(abs(p->pdgId()) != 6 && mother1->status() == 21 && mother2->status() == 21) {
+        if(p->pt() > 20) gluons.push_back(*p);
+      }
+    }
+  }
+
+  return gluons;
+}
+
+////
