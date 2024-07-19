@@ -149,6 +149,49 @@ namespace uhh2 {
     float dR;
   };
   
-  
+  class Tau32Cut_gen : public Selection {
+
+  public:
+    explicit Tau32Cut_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float cut;
+  };
+
+  class Tau42Cut_gen : public Selection {
+
+  public:
+    explicit Tau42Cut_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float cut;
+  };
+
+  class GroomedTau32Cut_gen : public Selection {
+
+  public:
+    explicit GroomedTau32Cut_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float cut;
+  };
+
+  class GroomedTau42Cut_gen : public Selection {
+
+  public:
+    explicit GroomedTau42Cut_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float cut;
+  };
+
   
 }

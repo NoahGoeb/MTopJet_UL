@@ -245,3 +245,71 @@ bool uhh2::GluonMatched_gen::passes(const uhh2::Event& event){
 }
 
 ////////////////////////////////////////////////////////
+
+uhh2::Tau32Cut_gen::Tau32Cut_gen(uhh2::Context& ctx, const std::string & name, float cut_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+cut(cut_){}
+
+bool uhh2::Tau32Cut_gen::passes(const uhh2::Event& event){
+  bool pass = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  if(jets.size() > 0 && jets.at(0).tau2() != 0) {
+    if(jets.at(0).tau3()/jets.at(0).tau2() < cut) {
+      pass = true;
+    }
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////
+
+uhh2::Tau42Cut_gen::Tau42Cut_gen(uhh2::Context& ctx, const std::string & name, float cut_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+cut(cut_){}
+
+bool uhh2::Tau42Cut_gen::passes(const uhh2::Event& event){
+  bool pass = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  if(jets.size() > 0 && jets.at(0).tau2() != 0) {
+    if(jets.at(0).tau4()/jets.at(0).tau2() < cut) {
+      pass = true;
+    }
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////
+
+uhh2::GroomedTau32Cut_gen::GroomedTau32Cut_gen(uhh2::Context& ctx, const std::string & name, float cut_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+cut(cut_){}
+
+bool uhh2::GroomedTau32Cut_gen::passes(const uhh2::Event& event){
+  bool pass = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  if(jets.size() > 0 && jets.at(0).tau2_groomed() != 0) {
+    if(jets.at(0).tau3_groomed()/jets.at(0).tau2_groomed() < cut) {
+      pass = true;
+    }
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////
+
+uhh2::GroomedTau42Cut_gen::GroomedTau42Cut_gen(uhh2::Context& ctx, const std::string & name, float cut_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+cut(cut_){}
+
+bool uhh2::GroomedTau42Cut_gen::passes(const uhh2::Event& event){
+  bool pass = false;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  if(jets.size() > 0 && jets.at(0).tau2_groomed() != 0) {
+    if(jets.at(0).tau4_groomed()/jets.at(0).tau2_groomed() < cut) {
+      pass = true;
+    }
+  }
+  return pass;
+}
+
+////////////////////////////////////////////////////////
