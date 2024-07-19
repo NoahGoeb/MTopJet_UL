@@ -193,5 +193,16 @@ namespace uhh2 {
     float cut;
   };
 
+  class FullyMerged_Matched : public Selection {
+
+  public:
+    explicit FullyMerged_Matched(Context&, const std::string &, unsigned int);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    unsigned int index;
+  };
   
 }

@@ -313,3 +313,52 @@ bool uhh2::GroomedTau42Cut_gen::passes(const uhh2::Event& event){
 }
 
 ////////////////////////////////////////////////////////
+
+uhh2::FullyMerged_Matched::FullyMerged_Matched(uhh2::Context& ctx, const std::string & name, unsigned int index_):
+h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+index(index_) {}
+
+bool uhh2::FullyMerged_Matched::passes(const uhh2::Event& event){
+  
+  bool matched = true;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  std::vector<GenJet> subjets;
+  if (jets.size() > index) subjets = jets.at(index).subjets();
+  else return false;
+  const auto & ttbargen = event.get(h_ttbargen);
+
+  GenParticle bot, q1, q2;
+  if(ttbargen.IsTopHadronicDecay()) {
+    bot = ttbargen.bTop();
+    q1 = ttbargen.Wdecay1();
+    q2 = ttbargen.Wdecay2();
+  }
+  else if(ttbargen.IsAntiTopHadronicDecay()) {
+    bot = ttbargen.bAntitop();
+    q1 = ttbargen.WMinusdecay1();
+    q2 = ttbargen.WMinusdecay2();
+  }
+
+  std::vector<GenParticle> quarks = {bot, q1, q2};
+
+  if(subjets.size() == 3) {
+    for(unsigned int i=0; i<quarks.size(); i++) {
+      double minR = 100;
+      for(unsigned int j=0; j<subjets.size(); j++) {
+        double tmpR = deltaR(quarks.at(i), subjets.at(j));
+        if(tmpR < minR) {
+          minR = tmpR;
+        }
+      }
+      if(minR > 0.4) {
+        matched = false;
+      }
+    }
+  } else {
+    matched = false;
+  }
+  return matched;
+}
+
+////////////////////////////////////////////////////////
